@@ -1,0 +1,125 @@
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 3rem 0;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 217, 61, 0.08);
+  border: 2px solid #ffd93d;
+  color: #f3e9b8;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family:
+    DM Sans,
+    sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(255, 217, 61, 0.15);
+  box-shadow: 0 0 15px rgba(255, 217, 61, 0.3);
+  transform: translateY(-2px);
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: rgba(255, 217, 61, 0.3);
+}
+
+.pagination-btn.active {
+  background: linear-gradient(135deg, #ffd93d, #ff4c29);
+  color: #000000;
+  border-color: #ffd93d;
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(255, 217, 61, 0.5);
+}
+
+.pagination-prev,
+.pagination-next {
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.5rem 0.5rem;
+}
+
+.pagination-nav {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.pagination-ellipsis {
+  color: #d8c774;
+  padding: 0 0.25rem;
+  user-select: none;
+}
+
+.pagination-info {
+  color: #ffd93d;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-left: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pagination-btn {
+    min-width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .pagination-info {
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+  }
+
+  .pagination-prev,
+  .pagination-next {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination-container {
+    gap: 0.25rem;
+    margin: 2rem 0;
+  }
+
+  .pagination-btn {
+    min-width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .pagination-info {
+    font-size: 0.7rem;
+    margin-left: 0.25rem;
+    display: none;
+  }
+
+  .pagination-ellipsis {
+    display: none;
+  }
+}

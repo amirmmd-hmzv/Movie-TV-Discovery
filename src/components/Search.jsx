@@ -17,7 +17,7 @@ const Search = ({ searchTerm, setSearchTerm }) => {
           </svg>
           <input
             type="text"
-            placeholder="Search through thousands of movies"
+            placeholder="Search movies & series..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

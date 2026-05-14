@@ -22,10 +22,10 @@
   --background-image-hero-pattern: radial-gradient(
     circle at top center,
     rgba(255, 217, 61, 0.95) 0%,
-     rgba(255, 140, 0, 0.8) 25%,
+    rgba(255, 140, 0, 0.8) 25%,
     rgba(30, 20, 0, 0.6) 55%,
     rgba(0, 0, 0, 0.95) 85%,
-    #000000 100% 
+    #000000 100%
   );
 }
 
@@ -171,4 +171,12 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+.no-results {
+  text-align: center;
+  color: var(--color-light-100);
+  font-size: 1.125rem;
+  font-weight: 600;
+  padding: 2rem 1rem;
 }
