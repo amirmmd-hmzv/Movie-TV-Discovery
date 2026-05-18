@@ -67,11 +67,26 @@ function MovieDetailsPage() {
   // Handle both movie and TV series data
   const title = movie.title || movie.name;
   const releaseDate = movie.release_date || movie.first_air_date;
-  const runtime = movie.runtime
-    ? `${movie.runtime} min`
-    : movie.episode_run_time
-      ? `${movie.episode_run_time[0]} min/episode`
-      : "N/A";
+  
+  // Properly handle runtime for both movies and TV series
+  let runtime = "N/A";
+  if (mediaType === "movie") {
+    // For movies: use runtime directly
+    runtime = movie.runtime ? `${movie.runtime} min` : "N/A";
+  } else {
+    // For TV series: use episode_run_time array
+    if (
+      movie.episode_run_time &&
+      Array.isArray(movie.episode_run_time) &&
+      movie.episode_run_time.length > 0 &&
+      movie.episode_run_time[0] > 0
+    ) {
+      runtime = `${movie.episode_run_time[0]} min/episode`;
+    } else {
+      runtime = "N/A";
+    }
+  }
+  
   const year = releaseDate ? new Date(releaseDate).getFullYear() : "N/A";
 
   // TV-specific data

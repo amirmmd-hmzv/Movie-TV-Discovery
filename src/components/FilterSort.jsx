@@ -9,12 +9,14 @@ function FilterSort({
   setGenreFilter,
   yearFilter,
   setYearFilter,
+  isSearchMode = false,
 }) {
+  // ✅ fix: مقادیر درست TMDB — "rating" وجود نداره، باید "vote_average" باشه
   const sortOptions = [
     { value: "popularity.desc", label: "Popularity (High to Low)" },
     { value: "popularity.asc", label: "Popularity (Low to High)" },
-    { value: "rating.desc", label: "Rating (High to Low)" },
-    { value: "rating.asc", label: "Rating (Low to High)" },
+    { value: "vote_average.desc", label: "Rating (High to Low)" },
+    { value: "vote_average.asc", label: "Rating (Low to High)" },
     { value: "release_date.desc", label: "Release Date (Newest)" },
     { value: "release_date.asc", label: "Release Date (Oldest)" },
   ];
@@ -54,7 +56,7 @@ function FilterSort({
   return (
     <div className="filter-sort-container">
       <div className="filter-sort-wrapper">
-        {/* Media Type Toggle */}
+        {/* Media Type Toggle — همیشه فعال، حتی در سرچ */}
         <div className="filter-group">
           <label className="filter-label">Content Type</label>
           <div className="media-type-toggle">
@@ -73,16 +75,17 @@ function FilterSort({
           </div>
         </div>
 
-        {/* Sort Select */}
-        <div className="filter-group">
+        {/* Sort — در سرچ غیرفعاله */}
+        <div className="filter-group" style={{ opacity: isSearchMode ? 0.4 : 1 }}>
           <label htmlFor="sort" className="filter-label">
-            Sort By
+            Sort By{isSearchMode && <span style={{ fontSize: "0.7rem", fontStyle: "italic", marginLeft: "6px" }}>(Explore only)</span>}
           </label>
           <select
             id="sort"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="filter-select"
+            disabled={isSearchMode}
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -92,16 +95,17 @@ function FilterSort({
           </select>
         </div>
 
-        {/* Genre Select */}
-        <div className="filter-group">
+        {/* Genre — در سرچ غیرفعاله */}
+        <div className="filter-group" style={{ opacity: isSearchMode ? 0.4 : 1 }}>
           <label htmlFor="genre" className="filter-label">
-            Genre
+            Genre{isSearchMode && <span style={{ fontSize: "0.7rem", fontStyle: "italic", marginLeft: "6px" }}>(Explore only)</span>}
           </label>
           <select
             id="genre"
             value={genreFilter}
             onChange={(e) => setGenreFilter(e.target.value)}
             className="filter-select"
+            disabled={isSearchMode}
           >
             {genreOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -111,16 +115,17 @@ function FilterSort({
           </select>
         </div>
 
-        {/* Year Select */}
-        <div className="filter-group">
+        {/* Year — در سرچ غیرفعاله */}
+        <div className="filter-group" style={{ opacity: isSearchMode ? 0.4 : 1 }}>
           <label htmlFor="year" className="filter-label">
-            Release Year
+            Release Year{isSearchMode && <span style={{ fontSize: "0.7rem", fontStyle: "italic", marginLeft: "6px" }}>(Explore only)</span>}
           </label>
           <select
             id="year"
             value={yearFilter}
             onChange={(e) => setYearFilter(e.target.value)}
             className="filter-select"
+            disabled={isSearchMode}
           >
             {yearOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -130,7 +135,7 @@ function FilterSort({
           </select>
         </div>
 
-        {/* Reset Button */}
+        {/* Reset */}
         <button
           className="reset-btn"
           onClick={() => {

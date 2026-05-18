@@ -1,7 +1,7 @@
 const Search = ({ searchTerm, setSearchTerm }) => {
   return (
     <div>
-      <div className="search">
+      <div className="search w-full ">
         <div className="text-accent">
           <svg
             xmlns="http://www.w3.org/2000/svg"

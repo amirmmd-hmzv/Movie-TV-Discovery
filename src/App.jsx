@@ -13,9 +13,9 @@ import {
   saveFilterState,
   loadFilterState,
 } from "./utils/sessionStorageManager";
+import HeroPosterStack from "./components/HeroPosterStack";
 
 function HomePage() {
-  // Load initial state from sessionStorage
   const initialState = loadFilterState();
 
   const [searchTerm, setSearchTerm] = useState(initialState.searchTerm);
@@ -26,11 +26,19 @@ function HomePage() {
   const [debouncedValue, setDebouncedValue] = useState(initialState.searchTerm);
   const [currentPage, setCurrentPage] = useState(initialState.currentPage);
   const [totalPages, setTotalPages] = useState(0);
-  const [sortBy, setSortBy] = useState(initialState.sortBy);
-  const [mediaType, setMediaType] = useState(initialState.mediaType);
-  const [genreFilter, setGenreFilter] = useState(initialState.genreFilter);
-  const [yearFilter, setYearFilter] = useState(initialState.yearFilter);
+  const [sortBy, setSortBy] = useState(
+    initialState.sortBy || "popularity.desc",
+  );
+  // "movie" | "tv"
+  const [mediaType, setMediaType] = useState(initialState.mediaType || "movie");
+  const [genreFilter, setGenreFilter] = useState(
+    initialState.genreFilter || "",
+  );
+  const [yearFilter, setYearFilter] = useState(initialState.yearFilter || "");
   const [hasNoResults, setHasNoResults] = useState(false);
+
+  const isSearching = debouncedValue.trim().length > 0;
+
   useDebounce(
     () => {
       setDebouncedValue(searchTerm);
@@ -40,7 +48,25 @@ function HomePage() {
     [searchTerm],
   );
 
-  // Save filter state to sessionStorage whenever it changes
+  // وقتی فیلترها عوض میشن page رو ریست کن
+  // ولی نه اگه currentPage خودش داره عوض میشه (جلوگیری از loop)
+  const handleSetSortBy = (val) => {
+    setSortBy(val);
+    setCurrentPage(1);
+  };
+  const handleSetMediaType = (val) => {
+    setMediaType(val);
+    setCurrentPage(1);
+  };
+  const handleSetGenreFilter = (val) => {
+    setGenreFilter(val);
+    setCurrentPage(1);
+  };
+  const handleSetYearFilter = (val) => {
+    setYearFilter(val);
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     saveFilterState({
       searchTerm,
@@ -67,52 +93,36 @@ function HomePage() {
     setHasNoResults(false);
 
     try {
-      let endpoint;
       let results = [];
       let apiTotalPages = 0;
 
       if (query) {
-        // Search endpoint - searches across movies AND tv series
-        endpoint = `/search/multi?query=${encodeURIComponent(query)}&page=${page}`;
+        // ── Search mode ──
+        // همیشه در نوع انتخاب‌شده سرچ کن (movie یا tv)
+        const endpoint = `/search/${mediaType}?query=${encodeURIComponent(query)}&page=${page}&include_adult=false`;
         const res = await axiosInstance.get(endpoint);
-        const apiResults = res.data.results || [];
         apiTotalPages = res.data.total_pages || 0;
+        results = (res.data.results || []).map((item) => ({
+          ...item,
+          media_type: mediaType,
+        }));
 
-        // Filter results: only valid media types (movie or tv)
-        // Remove persons, companies, etc
-  results = apiResults.filter((item) => {
-  const isValidMedia =
-    item.media_type === "movie" || item.media_type === "tv";
-  if (!isValidMedia) return false;
-
-  // فقط وقتی کاربر به‌صراحت media type رو توی فیلتر انتخاب کرده اعمال کن
-  // اما چون در حالت سرچ FilterSort مخفیه، این فیلتر رو نادیده بگیر
-  return true; // همه فیلم‌ها و سریال‌ها رو نشون بده
-});
-
-        // Handle pagination for filtered search results
-        // If this page has no valid results, set flag
         if (results.length === 0 && page > 1) {
           setHasNoResults(true);
-          // Try previous page automatically
-          setCurrentPage(page - 1);
+          setMoviesList([]);
           return;
         }
 
-        // For search with filters, pages might be sparse
-        // Show user current page but limit pagination to reasonable max
-        setTotalPages(Math.min(apiTotalPages, 50)); // Cap at 50 pages to avoid too many empty pages
+        setTotalPages(Math.min(apiTotalPages, 50));
       } else {
-        // Discover endpoint with filters and sort
-        const endpoint_base = `/discover/${mediaType}`;
+        // ── Discover mode ──
         const params = new URLSearchParams({
           sort_by: sortBy,
           page: page,
+          include_adult: false,
         });
 
-        if (genreFilter) {
-          params.append("with_genres", genreFilter);
-        }
+        if (genreFilter) params.append("with_genres", genreFilter);
 
         if (yearFilter) {
           const year = parseInt(yearFilter);
@@ -124,24 +134,20 @@ function HomePage() {
           }
         }
 
-        endpoint = `${endpoint_base}?${params.toString()}`;
-        const res = await axiosInstance.get(endpoint);
-        results = res.data.results || [];
-
-        // Add media_type to discover results
-        results = results.map((item) => ({
+        const res = await axiosInstance.get(
+          `/discover/${mediaType}?${params.toString()}`,
+        );
+        results = (res.data.results || []).map((item) => ({
           ...item,
           media_type: mediaType,
         }));
-
         setTotalPages(res.data.total_pages || 0);
       }
 
       setMoviesList(results);
 
-      // Track search if searching
       if (query && results.length > 0) {
-        updateSearchCount(debouncedValue, results[0]);
+        updateSearchCount(query, results[0]);
       }
     } catch (error) {
       console.error("Error fetching movies:", error);
@@ -155,6 +161,7 @@ function HomePage() {
 
   useEffect(() => {
     fetchMovies(debouncedValue, currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue, currentPage, sortBy, mediaType, genreFilter, yearFilter]);
 
   useEffect(() => {
@@ -166,10 +173,12 @@ function HomePage() {
       <div className="pattern" />
 
       <div className="wrapper">
-        <header>
+        <header className="flex  flex-col items-center gap-8">
+          <HeroPosterStack />
+
           <h1>
-            <img src="./hero.png" alt="hero images" />
-            Discover Movies You’ll Love{" "}
+            {/* <img src="./hero.png" alt="hero images" /> */}
+            Discover Movies You'll Love{" "}
             <span className="text-gradient">Instantly!</span>
           </h1>
           <Search setSearchTerm={setSearchTerm} searchTerm={searchTerm} />
@@ -177,7 +186,6 @@ function HomePage() {
           {trendsMovies.length > 0 && (
             <section className="trending">
               <h2>Trending Movies</h2>
-
               <ul>
                 {trendsMovies.map((movie, index) => (
                   <li key={movie.$id}>
@@ -191,20 +199,20 @@ function HomePage() {
         </header>
 
         <section className="all-movies">
-          <h2>{searchTerm ? "Search Results" : "Explore"}</h2>
+          <h2>{isSearching ? `Results for "${debouncedValue}"` : "Explore"}</h2>
 
-          {!searchTerm && (
-            <FilterSort
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-              mediaType={mediaType}
-              setMediaType={setMediaType}
-              genreFilter={genreFilter}
-              setGenreFilter={setGenreFilter}
-              yearFilter={yearFilter}
-              setYearFilter={setYearFilter}
-            />
-          )}
+          {/* FilterSort همیشه نشون داده میشه، ولی در حالت سرچ فقط media type فعاله */}
+          <FilterSort
+            sortBy={sortBy}
+            setSortBy={handleSetSortBy}
+            mediaType={mediaType}
+            setMediaType={handleSetMediaType}
+            genreFilter={genreFilter}
+            setGenreFilter={handleSetGenreFilter}
+            yearFilter={yearFilter}
+            setYearFilter={handleSetYearFilter}
+            isSearchMode={isSearching}
+          />
 
           {isLoading ? (
             <SkeletonList count={5} />
@@ -235,9 +243,9 @@ function HomePage() {
             <>
               <div className="movies-list">
                 <ul>
-                  {moviesList.map((movie) => {
-                    return <MovieCard key={movie.id} movie={movie} />;
-                  })}
+                  {moviesList.map((movie) => (
+                    <MovieCard key={movie.id} movie={movie} />
+                  ))}
                 </ul>
               </div>
               {totalPages > 1 && (
