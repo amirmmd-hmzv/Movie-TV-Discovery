@@ -1,8 +1,97 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosConfig";
-import Spinner from "./Spinner";
-import "../styles/MovieDetailsPage.css";
+
+/* ── Skeleton loader ── */
+function SkeletonLoader() {
+  const shimmer = {
+    background:
+      "linear-gradient(90deg, rgba(255,217,61,0.04) 0%, rgba(255,217,61,0.13) 40%, rgba(255,217,61,0.04) 80%)",
+    backgroundSize: "600px 100%",
+    animation: "shimmer 1.6s infinite linear",
+    borderRadius: 8,
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        background: "#000",
+        padding: "1.5rem 1rem 5rem",
+        overflowX: "hidden",
+      }}
+    >
+      {/* Back button skeleton */}
+      <div style={{ ...shimmer, width: 90, height: 42, marginBottom: "2rem", borderRadius: 8 }} />
+
+      {/* Hero grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "260px 1fr",
+          gap: "2.5rem",
+          maxWidth: "72rem",
+          margin: "0 auto",
+          padding: "0 1rem 3rem",
+        }}
+      >
+        {/* Poster */}
+        <div style={{ ...shimmer, width: "100%", aspectRatio: "2/3", borderRadius: 16 }} />
+
+        {/* Info panel */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", paddingTop: 4 }}>
+          {/* Badge */}
+          <div style={{ ...shimmer, width: 80, height: 24, borderRadius: 999 }} />
+          {/* Title */}
+          <div style={{ ...shimmer, width: "68%", height: "2.6rem", borderRadius: 10 }} />
+          {/* Meta chips */}
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            {[70, 90, 120].map((w, i) => (
+              <div key={i} style={{ ...shimmer, width: w, height: 30, borderRadius: 8 }} />
+            ))}
+          </div>
+          {/* Genre tags */}
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            {[85, 72, 98].map((w, i) => (
+              <div key={i} style={{ ...shimmer, width: w, height: 30, borderRadius: 999 }} />
+            ))}
+          </div>
+          {/* Overview label */}
+          <div style={{ ...shimmer, width: 65, height: 11, borderRadius: 6, marginTop: "0.5rem" }} />
+          {/* Overview lines */}
+          {["92%", "85%", "78%", "55%"].map((w, i) => (
+            <div key={i} style={{ ...shimmer, width: w, height: 14, borderRadius: 6 }} />
+          ))}
+          {/* Trailer button */}
+          <div style={{ ...shimmer, width: 150, height: 44, borderRadius: 8, marginTop: "0.5rem" }} />
+        </div>
+      </div>
+
+      {/* Cast section */}
+      <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1rem" }}>
+        {/* Cast title */}
+        <div style={{ ...shimmer, width: 60, height: 20, borderRadius: 6, marginBottom: "1.5rem" }} />
+        {/* Cast grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+            gap: "1rem",
+          }}
+        >
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} style={{ textAlign: "center" }}>
+              <div style={{ ...shimmer, width: "100%", aspectRatio: "2/3", borderRadius: 12, marginBottom: 10 }} />
+              <div style={{ ...shimmer, width: "80%", height: 11, borderRadius: 6, margin: "0 auto 6px" }} />
+              <div style={{ ...shimmer, width: "60%", height: 10, borderRadius: 6, margin: "0 auto" }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function MovieDetailsPage() {
   const { id } = useParams();
@@ -11,43 +100,35 @@ function MovieDetailsPage() {
   const [movie, setMovie] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [imgLoaded, setImgLoaded] = useState(false);
 
-  // Determine if it's a movie or TV series based on the URL path
   const mediaType = location.pathname.includes("/tv/") ? "tv" : "movie";
 
   useEffect(() => {
-    const fetchMovieDetails = async () => {
-      setIsLoading(true);
-      setError("");
-      try {
-        const endpoint = `/${mediaType}/${id}?append_to_response=credits,videos`;
-        const res = await axiosInstance.get(endpoint);
-        setMovie(res.data);
-      } catch (err) {
-        console.error("Error fetching details:", err);
-        setError("Failed to load details. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMovieDetails();
+    setIsLoading(true);
+    setError("");
+    setImgLoaded(false);
+    axiosInstance
+      .get(`/${mediaType}/${id}?append_to_response=credits,videos`)
+      .then((res) => setMovie(res.data))
+      .catch(() => setError("Failed to load details. Please try again."))
+      .finally(() => setIsLoading(false));
   }, [id, mediaType]);
 
-  if (isLoading) return <Spinner />;
+  if (isLoading) return <SkeletonLoader />;
 
   if (error) {
     return (
-      <div className="movie-details-error">
+      <div className="details-error">
         <p>{error}</p>
-        <button onClick={() => navigate("/")} className="back-button">
-          Back to Home
+        <button onClick={() => navigate("/")} className="back-btn">
+          ← Back to Home
         </button>
       </div>
     );
   }
 
-  if (!movie) return <div>No content found</div>;
+  if (!movie) return null;
 
   const backdropUrl = movie.backdrop_path
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
@@ -62,34 +143,23 @@ function MovieDetailsPage() {
     mediaType === "tv" && movie.created_by?.length > 0
       ? movie.created_by[0].name
       : null;
-  const cast = movie.credits?.cast?.slice(0, 6) || [];
+  const cast = movie.credits?.cast?.slice(0, 8) || [];
 
-  // Handle both movie and TV series data
   const title = movie.title || movie.name;
   const releaseDate = movie.release_date || movie.first_air_date;
-  
-  // Properly handle runtime for both movies and TV series
-  let runtime = "N/A";
-  if (mediaType === "movie") {
-    // For movies: use runtime directly
-    runtime = movie.runtime ? `${movie.runtime} min` : "N/A";
-  } else {
-    // For TV series: use episode_run_time array
-    if (
-      movie.episode_run_time &&
-      Array.isArray(movie.episode_run_time) &&
-      movie.episode_run_time.length > 0 &&
-      movie.episode_run_time[0] > 0
-    ) {
-      runtime = `${movie.episode_run_time[0]} min/episode`;
-    } else {
-      runtime = "N/A";
-    }
-  }
-  
   const year = releaseDate ? new Date(releaseDate).getFullYear() : "N/A";
 
-  // TV-specific data
+  let runtime = "N/A";
+  if (mediaType === "movie") {
+    runtime = movie.runtime ? `${movie.runtime} min` : "N/A";
+  } else if (movie.episode_run_time?.length > 0 && movie.episode_run_time[0] > 0) {
+    runtime = `${movie.episode_run_time[0]} min/ep`;
+  }
+
+  const score = movie.vote_average ? Math.round(movie.vote_average * 10) : 0;
+  const scoreColor =
+    score >= 75 ? "#4ade80" : score >= 50 ? "#ffd93d" : "#ff4c29";
+
   const numberOfSeasons = movie.number_of_seasons;
   const numberOfEpisodes = movie.number_of_episodes;
   const status = movie.status;
@@ -98,146 +168,168 @@ function MovieDetailsPage() {
   const nextAirDate = movie.next_episode_to_air?.air_date;
 
   return (
-    <main className="movie-details">
-      <button onClick={() => navigate("/")} className="back-button">
-        ← Back
-      </button>
-
+    <main className="details-page">
       {backdropUrl && (
-        <div
-          className="movie-backdrop"
-          style={{ backgroundImage: `url(${backdropUrl})` }}
-        >
-          <div className="backdrop-overlay" />
+        <div className="details-backdrop">
+          <img src={backdropUrl} alt="" aria-hidden />
+          <div className="details-backdrop__fade" />
         </div>
       )}
 
-      <div className="movie-details-container">
-        <div className="movie-poster">
-          <img src={posterUrl} alt={title} />
+      <button onClick={() => navigate("/")} className="back-btn">
+        ← Back
+      </button>
+
+      <div className="details-hero">
+        <div className={`details-poster-wrap ${imgLoaded ? "is-loaded" : ""}`}>
+          <img
+            className="details-poster"
+            src={posterUrl}
+            alt={title}
+            onLoad={() => setImgLoaded(true)}
+          />
+          <div className="details-score" style={{ "--score-color": scoreColor }}>
+            <span
+              className={`details-score__num w-full h-full bg-[${scoreColor}] border-[${scoreColor}] border-6 justify-center items-center flex rounded-4xl`}
+              style={{ color: scoreColor }}
+            >
+              {movie.vote_average?.toFixed(1)}
+            </span>
+          </div>
         </div>
 
-        <div className="movie-info">
-          <h1>{title}</h1>
+        <div className="details-info">
+          <span className="details-badge">
+            {mediaType === "tv" ? "TV Series" : "Movie"}
+          </span>
 
-          <div className="movie-meta">
-            <span className="rating">
-              ⭐ {movie.vote_average?.toFixed(1) || "N/A"} / 10
-            </span>
-            <span className="release-date">{year}</span>
-            <span className="runtime">{runtime}</span>
+          <h1 className="details-title">{title}</h1>
+
+          <div className="details-meta">
+            <span className="meta-chip">{year}</span>
+            <span className="meta-chip">{runtime}</span>
+            {movie.vote_count && (
+              <span className="meta-chip">
+                {movie.vote_count.toLocaleString()} votes
+              </span>
+            )}
             {mediaType === "tv" && status && (
-              <span className="status">{status}</span>
+              <span className={`meta-chip ${status === "Returning Series" ? "meta-chip--green" : ""}`}>
+                {status}
+              </span>
             )}
           </div>
 
-          {movie.genres && (
-            <div className="genres">
-              {movie.genres.map((genre) => (
-                <span key={genre.id} className="genre-tag">
-                  {genre.name}
-                </span>
+          {movie.genres?.length > 0 && (
+            <div className="details-genres">
+              {movie.genres.map((g) => (
+                <span key={g.id} className="genre-tag">{g.name}</span>
               ))}
             </div>
           )}
 
-          <div className="overview">
-            <h2>Overview</h2>
-            <p>{movie.overview || "No overview available."}</p>
+          <div className="details-section">
+            <h2 className="details-section__label">Overview</h2>
+            <p className="details-overview">
+              {movie.overview || "No overview available."}
+            </p>
           </div>
 
-          {mediaType === "tv" &&
-            (numberOfSeasons || numberOfEpisodes || networks.length > 0) && (
-              <div className="tv-info">
-                <h2>Series Information</h2>
-                <div className="tv-details">
-                  {numberOfSeasons && (
-                    <div className="tv-detail-item">
-                      <span className="detail-label">Seasons:</span>
-                      <span className="detail-value">{numberOfSeasons}</span>
-                    </div>
-                  )}
-                  {numberOfEpisodes && (
-                    <div className="tv-detail-item">
-                      <span className="detail-label">Episodes:</span>
-                      <span className="detail-value">{numberOfEpisodes}</span>
-                    </div>
-                  )}
-                  {networks.length > 0 && (
-                    <div className="tv-detail-item">
-                      <span className="detail-label">Network:</span>
-                      <span className="detail-value">{networks[0].name}</span>
-                    </div>
-                  )}
-                  {lastAirDate && (
-                    <div className="tv-detail-item">
-                      <span className="detail-label">Last Aired:</span>
-                      <span className="detail-value">
-                        {new Date(lastAirDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
-                  {nextAirDate && (
-                    <div className="tv-detail-item">
-                      <span className="detail-label">Next Episode:</span>
-                      <span className="detail-value">
-                        {new Date(nextAirDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
+          {mediaType === "tv" && (numberOfSeasons || numberOfEpisodes || networks.length > 0) && (
+            <div className="tv-grid">
+              {numberOfSeasons && (
+                <div className="tv-grid__cell">
+                  <span className="tv-grid__label">Seasons</span>
+                  <span className="tv-grid__val">{numberOfSeasons}</span>
                 </div>
-              </div>
-            )}
+              )}
+              {numberOfEpisodes && (
+                <div className="tv-grid__cell">
+                  <span className="tv-grid__label">Episodes</span>
+                  <span className="tv-grid__val">{numberOfEpisodes}</span>
+                </div>
+              )}
+              {networks[0] && (
+                <div className="tv-grid__cell">
+                  <span className="tv-grid__label">Network</span>
+                  <span className="tv-grid__val">{networks[0].name}</span>
+                </div>
+              )}
+              {lastAirDate && (
+                <div className="tv-grid__cell">
+                  <span className="tv-grid__label">Last Aired</span>
+                  <span className="tv-grid__val">
+                    {new Date(lastAirDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </span>
+                </div>
+              )}
+              {nextAirDate && (
+                <div className="tv-grid__cell">
+                  <span className="tv-grid__label">Next Ep</span>
+                  <span className="tv-grid__val">
+                    {new Date(nextAirDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {director && mediaType === "movie" && (
-            <div className="director">
-              <h3>Director</h3>
-              <p>{director.name}</p>
-            </div>
+            <p className="details-credit">
+              <span className="credit-label">Directed by</span> {director.name}
+            </p>
           )}
-
           {creator && mediaType === "tv" && (
-            <div className="director">
-              <h3>Creator</h3>
-              <p>{creator}</p>
-            </div>
-          )}
-
-          {cast.length > 0 && (
-            <div className="cast">
-              <h3>Cast</h3>
-              <div className="cast-list">
-                {cast.map((actor) => (
-                  <div key={actor.id} className="cast-member">
-                    {actor.profile_path && (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                        alt={actor.name}
-                      />
-                    )}
-                    <p>{actor.name}</p>
-                    <small>{actor.character}</small>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <p className="details-credit">
+              <span className="credit-label">Created by</span> {creator}
+            </p>
           )}
 
           {trailer && (
-            <div className="trailer">
-              <h3>Watch Trailer</h3>
-              <a
-                href={`https://www.youtube.com/watch?v=${trailer.key}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="trailer-button"
-              >
-                🎬 Watch on YouTube
-              </a>
-            </div>
+            <a
+              href={`https://www.youtube.com/watch?v=${trailer.key}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="trailer-btn"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              Watch Trailer
+            </a>
           )}
         </div>
       </div>
+
+      {cast.length > 0 && (
+        <section className="cast-section">
+          <h2 className="cast-section__title">Cast</h2>
+          <div className="cast-grid">
+            {cast.map((actor) => (
+              <div key={actor.id} className="cast-card">
+                <div className="cast-card__img-wrap">
+                  {actor.profile_path ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                      alt={actor.name}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="cast-card__no-img">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <p className="cast-card__name">{actor.name}</p>
+                <small className="cast-card__char">{actor.character}</small>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
