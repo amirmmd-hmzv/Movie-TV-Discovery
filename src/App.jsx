@@ -223,10 +223,7 @@ function HomePage() {
           />
 
           {isLoading ? (
-            <ErrorView
-              message={error}
-              onRetry={() => fetchMovies(debouncedValue, currentPage)}
-            />
+            <SkeletonList count={5} />
           ) : error ? (
             <ErrorView
               message={error}
@@ -255,7 +252,7 @@ function HomePage() {
             </p>
           ) : moviesList.length > 0 ? (
             <>
-              <div className="movies-list">
+              <div className="movies-list mt-20!">
                 <ul>
                   {moviesList.map((movie) => (
                     <MovieCard key={movie.id} movie={movie} />

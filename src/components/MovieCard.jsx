@@ -6,50 +6,72 @@ const MovieCard = ({
     media_type,
     title,
     name,
-    overview,
     poster_path,
     release_date,
     first_air_date,
     vote_average,
-    vote_count,
     original_language,
   },
 }) => {
-  // Handle both movies and TV series
   const displayTitle = title || name;
   const displayDate = release_date || first_air_date;
   const year = displayDate ? displayDate.split("-")[0] : "N/A";
-
-  // Construct the route based on media type
   const routePath = media_type === "tv" ? `/tv/${id}` : `/movie/${id}`;
+  const score = vote_average ? vote_average.toFixed(1) : "N/A";
+
+  // رنگ امتیاز بر اساس مقدار
+  const scoreClass =
+    vote_average >= 7.5 ? "score--high"
+    : vote_average >= 5  ? "score--mid"
+    : "score--low";
 
   return (
-    <Link to={routePath} style={{ textDecoration: "none" }}>
-      <div className="movie-card">
-        <img
-          src={
-            poster_path
-              ? `https://image.tmdb.org/t/p/w500/${poster_path}`
-              : "/no-movie.svg"
-          }
-          alt={displayTitle}
-        />
+    <Link to={routePath} className="movie-card-link">
+      <article className="movie-card">
 
-        <div className="mt-4">
-          <h3>{displayTitle}</h3>
+        {/* ── Poster ── */}
+        <div className="movie-card__poster-wrap">
+          <img
+            className="movie-card__poster"
+            src={
+              poster_path
+                ? `https://image.tmdb.org/t/p/w500/${poster_path}`
+                : "/no-movie.svg"
+            }
+            alt={displayTitle}
+            loading="lazy"
+          />
 
-          <div className="content">
-            <div className="rating">
-              <img src="star.svg" alt="star icon" />
-              <p>{vote_average ? vote_average.toFixed(1) : "N/A"}</p>
-            </div>
-            <span>•</span>
-            <p className="lang">{original_language}</p>
-            <span>•</span>
-            <p className="year">{year}</p>
+          {/* overlay روی hover */}
+          <div className="movie-card__overlay" aria-hidden="true" />
+
+          {/* نوع محتوا — گوشه بالا چپ */}
+          <span className="movie-card__type-badge">
+            {media_type === "tv" ? "Series" : "Movie"}
+          </span>
+
+          {/* امتیاز — گوشه بالا راست */}
+          <span className={`movie-card__score ${scoreClass}`}>
+            ★ {score}
+          </span>
+        </div>
+
+        {/* ── Info ── */}
+        <div className="movie-card__info">
+          <h3 className="movie-card__title">{displayTitle}</h3>
+
+          <div className="movie-card__meta">
+            <span className="movie-card__lang">
+              {original_language?.toUpperCase()}
+            </span>
+            <span className="movie-card__dot">·</span>
+            <span className="movie-card__year">{year}</span>
           </div>
         </div>
-      </div>
+
+        {/* shine sweep on hover */}
+        <div className="movie-card__shine" aria-hidden="true" />
+      </article>
     </Link>
   );
 };
