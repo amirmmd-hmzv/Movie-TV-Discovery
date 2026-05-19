@@ -13,7 +13,7 @@ import {
   saveFilterState,
   loadFilterState,
 } from "./utils/sessionStorageManager";
-import HeroPosterStack from "./components/HeroPosterStack";
+import ErrorView from "./components/Errorview";
 
 function HomePage() {
   const initialState = loadFilterState();
@@ -87,7 +87,16 @@ function HomePage() {
     }
   };
 
+  // TMDB hard limit — بیشتر از 500 قبول نمیکنه
+  const TMDB_MAX_PAGE = 500;
+
   const fetchMovies = async (query = "", page = 1) => {
+    const safePage = Math.max(1, Math.min(page, TMDB_MAX_PAGE));
+    if (safePage !== page) {
+      setCurrentPage(safePage);
+      return;
+    }
+
     setIsLoading(true);
     setError("");
     setHasNoResults(false);
@@ -118,7 +127,7 @@ function HomePage() {
         // ── Discover mode ──
         const params = new URLSearchParams({
           sort_by: sortBy,
-          page: page,
+          page: safePage,
           include_adult: false,
         });
 
@@ -141,7 +150,8 @@ function HomePage() {
           ...item,
           media_type: mediaType,
         }));
-        setTotalPages(res.data.total_pages || 0);
+        // TMDB max page = 500
+        setTotalPages(Math.min(res.data.total_pages || 0, TMDB_MAX_PAGE));
       }
 
       setMoviesList(results);
@@ -173,11 +183,9 @@ function HomePage() {
       <div className="pattern" />
 
       <div className="wrapper">
-        <header className="flex  flex-col items-center gap-8">
-          <HeroPosterStack />
-
+        <header>
           <h1>
-            {/* <img src="./hero.png" alt="hero images" /> */}
+            <img src="./hero.png" alt="hero images" />
             Discover Movies You'll Love{" "}
             <span className="text-gradient">Instantly!</span>
           </h1>
@@ -215,9 +223,15 @@ function HomePage() {
           />
 
           {isLoading ? (
-            <SkeletonList count={5} />
+            <ErrorView
+              message={error}
+              onRetry={() => fetchMovies(debouncedValue, currentPage)}
+            />
           ) : error ? (
-            <p className="error">{error}</p>
+            <ErrorView
+              message={error}
+              onRetry={() => fetchMovies(debouncedValue, currentPage)}
+            />
           ) : hasNoResults ? (
             <p className="no-results">
               No results found on this page. Try a different search or adjust

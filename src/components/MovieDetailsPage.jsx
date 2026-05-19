@@ -135,7 +135,7 @@ function MovieDetailsPage() {
     : null;
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-    : "/no-movie.png";
+    : "/no-movie.svg";
 
   const trailer = movie.videos?.results?.find((v) => v.type === "Trailer");
   const director = movie.credits?.crew?.find((c) => c.job === "Director");

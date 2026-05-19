@@ -1,0 +1,111 @@
+<svg width="680" height="1020" viewBox="0 0 680 1020" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1025"/>
+      <stop offset="100%" stop-color="#0a0008"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd93d"/>
+      <stop offset="100%" stop-color="#ff4c29"/>
+    </linearGradient>
+    <linearGradient id="goldH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffd93d"/>
+      <stop offset="100%" stop-color="#ff4c29"/>
+    </linearGradient>
+    <mask id="ringMask">
+      <circle cx="340" cy="430" r="148" fill="white"/>
+      <circle cx="340" cy="430" r="90" fill="black"/>
+    </mask>
+  </defs>
+
+  <rect width="680" height="1020" fill="url(#bg)"/>
+
+  <!-- corner accents -->
+  <rect x="32" y="32" width="40" height="4" fill="url(#goldH)" opacity="0.5"/>
+  <rect x="32" y="32" width="4" height="40" fill="url(#goldH)" opacity="0.5"/>
+  <rect x="608" y="32" width="40" height="4" fill="url(#goldH)" opacity="0.5"/>
+  <rect x="644" y="32" width="4" height="40" fill="url(#goldH)" opacity="0.5"/>
+  <rect x="32" y="984" width="40" height="4" fill="url(#goldH)" opacity="0.5"/>
+  <rect x="32" y="948" width="4" height="40" fill="url(#goldH)" opacity="0.5"/>
+  <rect x="608" y="984" width="40" height="4" fill="url(#goldH)" opacity="0.5"/>
+  <rect x="644" y="948" width="4" height="40" fill="url(#goldH)" opacity="0.5"/>
+
+  <!-- film strip top/bottom -->
+  <rect x="0" y="0" width="680" height="64" fill="#0d0008"/>
+  <rect x="0" y="956" width="680" height="64" fill="#0d0008"/>
+
+  <!-- top holes -->
+  <rect x="20"  y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="68"  y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="116" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="164" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="212" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="260" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="308" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="356" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="404" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="452" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="500" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="548" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="596" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="632" y="14" width="28" height="36" rx="4" fill="#1a0d1a"/>
+
+  <!-- bottom holes -->
+  <rect x="20"  y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="68"  y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="116" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="164" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="212" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="260" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="308" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="356" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="404" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="452" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="500" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="548" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="596" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+  <rect x="632" y="970" width="28" height="36" rx="4" fill="#1a0d1a"/>
+
+  <!-- reel ring -->
+  <circle cx="340" cy="430" r="148" fill="#130010" mask="url(#ringMask)"/>
+  <circle cx="340" cy="430" r="148" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.6"/>
+
+  <!-- spokes -->
+  <g stroke="url(#gold)" stroke-width="3" stroke-linecap="round" opacity="0.55">
+    <line x1="340" y1="340" x2="340" y2="282"/>
+    <line x1="416" y1="385" x2="457" y2="363"/>
+    <line x1="416" y1="475" x2="457" y2="497"/>
+    <line x1="340" y1="520" x2="340" y2="578"/>
+    <line x1="264" y1="475" x2="223" y2="497"/>
+    <line x1="264" y1="385" x2="223" y2="363"/>
+  </g>
+
+  <!-- spoke tip circles -->
+  <g fill="url(#gold)" opacity="0.5">
+    <circle cx="340" cy="275" r="10"/>
+    <circle cx="463" cy="358" r="10"/>
+    <circle cx="463" cy="502" r="10"/>
+    <circle cx="340" cy="585" r="10"/>
+    <circle cx="217" cy="502" r="10"/>
+    <circle cx="217" cy="358" r="10"/>
+  </g>
+
+  <!-- hub -->
+  <circle cx="340" cy="430" r="28" fill="#0d0008" stroke="url(#gold)" stroke-width="2.5" opacity="0.9"/>
+  <polygon points="330,418 330,442 358,430" fill="url(#gold)" opacity="0.9"/>
+
+  <!-- glow rings -->
+  <circle cx="340" cy="430" r="160" fill="none" stroke="#ffd93d" stroke-width="1" opacity="0.12"/>
+  <circle cx="340" cy="430" r="172" fill="none" stroke="#ff4c29" stroke-width="0.5" opacity="0.07"/>
+
+  <!-- text -->
+  <text x="340" y="650" text-anchor="middle"
+    font-family="system-ui, sans-serif"
+    font-size="38" font-weight="700" letter-spacing="1"
+    fill="url(#goldH)">Poster Not Available</text>
+  <rect x="200" y="672" width="280" height="1.5" fill="url(#goldH)" opacity="0.35"/>
+  <text x="340" y="706" text-anchor="middle"
+    font-family="system-ui, sans-serif"
+    font-size="18" font-weight="400"
+    fill="#d8c774" opacity="0.6">No image found for this title</text>
+</svg>

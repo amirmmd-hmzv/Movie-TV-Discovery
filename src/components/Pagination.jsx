@@ -1,9 +1,15 @@
 import "../styles/Pagination.css";
 
+// TMDB هیچ‌وقت بیشتر از 500 صفحه رو قبول نمیکنه
+const TMDB_MAX_PAGE = 500;
+
 function Pagination({ currentPage, setCurrentPage, totalPages, isLoading }) {
+  // totalPages رو اینجا هم cap کن — defense in depth
+  const safeTotal = Math.min(totalPages, TMDB_MAX_PAGE);
+
   const maxPagesToShow = 5;
   let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-  let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+  let endPage = Math.min(safeTotal, startPage + maxPagesToShow - 1);
 
   if (endPage - startPage + 1 < maxPagesToShow) {
     startPage = Math.max(1, endPage - maxPagesToShow + 1);
@@ -15,13 +21,15 @@ function Pagination({ currentPage, setCurrentPage, totalPages, isLoading }) {
   }
 
   const handlePageChange = (page) => {
-    if (!isLoading && page !== currentPage && page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+    // clamp بین 1 و safeTotal
+    const target = Math.max(1, Math.min(page, safeTotal));
+    if (!isLoading && target !== currentPage) {
+      setCurrentPage(target);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  if (totalPages <= 1) return null;
+  if (safeTotal <= 1) return null;
 
   return (
     <div className="pagination-container">
@@ -67,17 +75,17 @@ function Pagination({ currentPage, setCurrentPage, totalPages, isLoading }) {
         </button>
       ))}
 
-      {endPage < totalPages && (
+      {endPage < safeTotal && (
         <>
-          {endPage < totalPages - 1 && (
+          {endPage < safeTotal - 1 && (
             <span className="pagination-ellipsis">...</span>
           )}
           <button
             className="pagination-btn"
-            onClick={() => handlePageChange(totalPages)}
+            onClick={() => handlePageChange(safeTotal)}
             disabled={isLoading}
           >
-            {totalPages}
+            {safeTotal}
           </button>
         </>
       )}
@@ -85,7 +93,7 @@ function Pagination({ currentPage, setCurrentPage, totalPages, isLoading }) {
       <button
         className="pagination-btn pagination-nav"
         onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages || isLoading}
+        disabled={currentPage === safeTotal || isLoading}
         title="Next page"
       >
         ⟩
@@ -93,15 +101,15 @@ function Pagination({ currentPage, setCurrentPage, totalPages, isLoading }) {
 
       <button
         className="pagination-btn pagination-next"
-        onClick={() => handlePageChange(totalPages)}
-        disabled={currentPage === totalPages || isLoading}
+        onClick={() => handlePageChange(safeTotal)}
+        disabled={currentPage === safeTotal || isLoading}
         title="Last page"
       >
         ⟩⟩
       </button>
 
       <span className="pagination-info">
-        Page {currentPage} of {totalPages}
+        Page {currentPage} of {safeTotal}
       </span>
     </div>
   );
