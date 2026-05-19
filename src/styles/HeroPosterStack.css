@@ -10,7 +10,7 @@
   width: 580px;
   height: 420px;
   flex-shrink: 0;
-  margin: 0 auto;
+  margin: 1.5rem auto;
 }
 
 /* ── shared card ── */

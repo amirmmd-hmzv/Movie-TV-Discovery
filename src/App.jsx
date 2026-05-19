@@ -14,6 +14,8 @@ import {
   loadFilterState,
 } from "./utils/sessionStorageManager";
 import ErrorView from "./components/Errorview";
+import HeroPosterStack from "./components/HeroPosterStack";
+import Header from "./components/Header";
 
 function HomePage() {
   const initialState = loadFilterState();
@@ -157,7 +159,8 @@ function HomePage() {
       setMoviesList(results);
 
       if (query && results.length > 0) {
-        updateSearchCount(query, results[0]);
+        console.log(results);
+        updateSearchCount(query, results[0], mediaType);
       }
     } catch (error) {
       console.error("Error fetching movies:", error);
@@ -178,27 +181,45 @@ function HomePage() {
     loadTrendingMovies();
   }, []);
 
+  console.log(trendsMovies);
   return (
     <main>
       <div className="pattern" />
 
       <div className="wrapper">
         <header>
-          <h1>
-            <img src="./hero.png" alt="hero images" />
+          <HeroPosterStack />
+          <h1 className="mt-10">
             Discover Movies You'll Love{" "}
-            <span className="text-gradient">Instantly!</span>
+            <span className="text-gradient ">Instantly!</span>
           </h1>
           <Search setSearchTerm={setSearchTerm} searchTerm={searchTerm} />
 
           {trendsMovies.length > 0 && (
             <section className="trending">
-              <h2>Trending Movies</h2>
+              <div className="trending-header">
+                <div className="trending-bar" />
+                <h2>Trending Searches</h2>
+                <span className="trending-badge">Live</span>
+              </div>
               <ul>
                 {trendsMovies.map((movie, index) => (
                   <li key={movie.$id}>
-                    <img src={movie.poster_url} alt={movie.title} />
-                    <p>{index + 1}</p>
+                    <span className="rank">{index + 1}</span>
+                    <div className="poster-wrap">
+                      <img src={movie.poster_url} alt={movie.title} />
+                      <div className="poster-overlay">
+                        {movie.title ?? movie.searchTerm}
+                      </div>
+                      {movie.count && (
+                        <span className="count-pill">
+                          {movie.count >= 1000
+                            ? `${(movie.count / 1000).toFixed(1).replace(/\.0$/, "")}k`
+                            : movie.count}{" "}
+                          searches
+                        </span>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -252,7 +273,7 @@ function HomePage() {
             </p>
           ) : moviesList.length > 0 ? (
             <>
-              <div className="movies-list mt-20!">
+              <div className="movies-list mt-20">
                 <ul>
                   {moviesList.map((movie) => (
                     <MovieCard key={movie.id} movie={movie} />
@@ -283,6 +304,7 @@ function HomePage() {
 function App() {
   return (
     <Router>
+      <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/movie/:id" element={<MovieDetailsPage />} />
