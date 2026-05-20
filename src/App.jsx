@@ -16,6 +16,11 @@ import {
 import ErrorView from "./components/Errorview";
 import HeroPosterStack from "./components/HeroPosterStack";
 import Header from "./components/Header";
+import LoginPage from "./components/LoginPage";
+import SignUpPage from "./components/SignUpPage";
+import WatchlistPage from "./components/WatchlistPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useAuth } from "./context/AuthContext";
 
 function HomePage() {
   const initialState = loadFilterState();
@@ -302,13 +307,25 @@ function HomePage() {
 }
 
 function App() {
+  const { user } = useAuth();
+  console.log(user)
   return (
     <Router>
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="/movie/:id" element={<MovieDetailsPage />} />
         <Route path="/tv/:id" element={<MovieDetailsPage />} />
+        <Route
+          path="/watchlist"
+          element={
+            <ProtectedRoute>
+              <WatchlistPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

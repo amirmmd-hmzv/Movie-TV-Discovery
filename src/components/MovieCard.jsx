@@ -1,4 +1,11 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import {
+  addToWatchlist,
+  removeFromWatchlist,
+  isInWatchlist,
+} from "../appwrite";
 
 const MovieCard = ({
   movie: {
@@ -11,8 +18,62 @@ const MovieCard = ({
     first_air_date,
     vote_average,
     original_language,
+    ...movieData
   },
 }) => {
+  const { user } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Check if in watchlist on mount
+  useEffect(() => {
+    if (user?.userId) {
+      checkWatchlist();
+    }
+  }, [user?.userId, id, media_type]);
+
+  const checkWatchlist = async () => {
+    try {
+      const inWatchlist = await isInWatchlist(user.userId, id, media_type);
+      setIsFavorite(inWatchlist);
+    } catch (error) {
+      console.error("Error checking watchlist:", error);
+    }
+  };
+
+  const handleToggleFavorite = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      alert("Please login to add to watchlist");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (isFavorite) {
+        await removeFromWatchlist(user.userId, id, media_type);
+        setIsFavorite(false);
+      } else {
+        await addToWatchlist(user.userId, id, media_type, {
+          title: title || name,
+          poster_path,
+          vote_average,
+          overview: movieData.overview,
+          release_date,
+          first_air_date,
+          media_type,
+          ...movieData,
+        });
+        setIsFavorite(true);
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const displayTitle = title || name;
   const displayDate = release_date || first_air_date;
   const year = displayDate ? displayDate.split("-")[0] : "N/A";
@@ -21,14 +82,15 @@ const MovieCard = ({
 
   // رنگ امتیاز بر اساس مقدار
   const scoreClass =
-    vote_average >= 7.5 ? "score--high"
-    : vote_average >= 5  ? "score--mid"
-    : "score--low";
+    vote_average >= 7.5
+      ? "score--high"
+      : vote_average >= 5
+        ? "score--mid"
+        : "score--low";
 
   return (
     <Link to={routePath} className="movie-card-link">
       <article className="movie-card">
-
         {/* ── Poster ── */}
         <div className="movie-card__poster-wrap">
           <img
@@ -51,9 +113,17 @@ const MovieCard = ({
           </span>
 
           {/* امتیاز — گوشه بالا راست */}
-          <span className={`movie-card__score ${scoreClass}`}>
-            ★ {score}
-          </span>
+          <span className={`movie-card__score ${scoreClass}`}>★ {score}</span>
+
+          {/* Favorite Heart Button — گوشه پایین راست */}
+          <button
+            onClick={handleToggleFavorite}
+            disabled={isLoading}
+            className={`movie-card__favorite-btn ${isFavorite ? "active" : ""}`}
+            title={isFavorite ? "Remove from watchlist" : "Add to watchlist"}
+          >
+            {isFavorite ? "♥" : "♡"}
+          </button>
         </div>
 
         {/* ── Info ── */}

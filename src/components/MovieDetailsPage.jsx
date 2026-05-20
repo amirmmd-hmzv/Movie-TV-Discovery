@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../axiosConfig";
+import { useAuth } from "../context/AuthContext";
+import {
+  addToWatchlist,
+  removeFromWatchlist,
+  isInWatchlist,
+} from "../appwrite";
 
 /* ── Skeleton loader ── */
 function SkeletonLoader() {
@@ -23,7 +29,15 @@ function SkeletonLoader() {
       }}
     >
       {/* Back button skeleton */}
-      <div style={{ ...shimmer, width: 90, height: 42, marginBottom: "2rem", borderRadius: 8 }} />
+      <div
+        style={{
+          ...shimmer,
+          width: 90,
+          height: 42,
+          marginBottom: "2rem",
+          borderRadius: 8,
+        }}
+      />
 
       {/* Hero grid */}
       <div
@@ -37,41 +51,97 @@ function SkeletonLoader() {
         }}
       >
         {/* Poster */}
-        <div style={{ ...shimmer, width: "100%", aspectRatio: "2/3", borderRadius: 16 }} />
+        <div
+          style={{
+            ...shimmer,
+            width: "100%",
+            aspectRatio: "2/3",
+            borderRadius: 16,
+          }}
+        />
 
         {/* Info panel */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", paddingTop: 4 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            paddingTop: 4,
+          }}
+        >
           {/* Badge */}
-          <div style={{ ...shimmer, width: 80, height: 24, borderRadius: 999 }} />
+          <div
+            style={{ ...shimmer, width: 80, height: 24, borderRadius: 999 }}
+          />
           {/* Title */}
-          <div style={{ ...shimmer, width: "68%", height: "2.6rem", borderRadius: 10 }} />
+          <div
+            style={{
+              ...shimmer,
+              width: "68%",
+              height: "2.6rem",
+              borderRadius: 10,
+            }}
+          />
           {/* Meta chips */}
           <div style={{ display: "flex", gap: "0.5rem" }}>
             {[70, 90, 120].map((w, i) => (
-              <div key={i} style={{ ...shimmer, width: w, height: 30, borderRadius: 8 }} />
+              <div
+                key={i}
+                style={{ ...shimmer, width: w, height: 30, borderRadius: 8 }}
+              />
             ))}
           </div>
           {/* Genre tags */}
           <div style={{ display: "flex", gap: "0.5rem" }}>
             {[85, 72, 98].map((w, i) => (
-              <div key={i} style={{ ...shimmer, width: w, height: 30, borderRadius: 999 }} />
+              <div
+                key={i}
+                style={{ ...shimmer, width: w, height: 30, borderRadius: 999 }}
+              />
             ))}
           </div>
           {/* Overview label */}
-          <div style={{ ...shimmer, width: 65, height: 11, borderRadius: 6, marginTop: "0.5rem" }} />
+          <div
+            style={{
+              ...shimmer,
+              width: 65,
+              height: 11,
+              borderRadius: 6,
+              marginTop: "0.5rem",
+            }}
+          />
           {/* Overview lines */}
           {["92%", "85%", "78%", "55%"].map((w, i) => (
-            <div key={i} style={{ ...shimmer, width: w, height: 14, borderRadius: 6 }} />
+            <div
+              key={i}
+              style={{ ...shimmer, width: w, height: 14, borderRadius: 6 }}
+            />
           ))}
           {/* Trailer button */}
-          <div style={{ ...shimmer, width: 150, height: 44, borderRadius: 8, marginTop: "0.5rem" }} />
+          <div
+            style={{
+              ...shimmer,
+              width: 150,
+              height: 44,
+              borderRadius: 8,
+              marginTop: "0.5rem",
+            }}
+          />
         </div>
       </div>
 
       {/* Cast section */}
       <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 1rem" }}>
         {/* Cast title */}
-        <div style={{ ...shimmer, width: 60, height: 20, borderRadius: 6, marginBottom: "1.5rem" }} />
+        <div
+          style={{
+            ...shimmer,
+            width: 60,
+            height: 20,
+            borderRadius: 6,
+            marginBottom: "1.5rem",
+          }}
+        />
         {/* Cast grid */}
         <div
           style={{
@@ -82,9 +152,33 @@ function SkeletonLoader() {
         >
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} style={{ textAlign: "center" }}>
-              <div style={{ ...shimmer, width: "100%", aspectRatio: "2/3", borderRadius: 12, marginBottom: 10 }} />
-              <div style={{ ...shimmer, width: "80%", height: 11, borderRadius: 6, margin: "0 auto 6px" }} />
-              <div style={{ ...shimmer, width: "60%", height: 10, borderRadius: 6, margin: "0 auto" }} />
+              <div
+                style={{
+                  ...shimmer,
+                  width: "100%",
+                  aspectRatio: "2/3",
+                  borderRadius: 12,
+                  marginBottom: 10,
+                }}
+              />
+              <div
+                style={{
+                  ...shimmer,
+                  width: "80%",
+                  height: 11,
+                  borderRadius: 6,
+                  margin: "0 auto 6px",
+                }}
+              />
+              <div
+                style={{
+                  ...shimmer,
+                  width: "60%",
+                  height: 10,
+                  borderRadius: 6,
+                  margin: "0 auto",
+                }}
+              />
             </div>
           ))}
         </div>
@@ -97,10 +191,13 @@ function MovieDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const [movie, setMovie] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
 
   const mediaType = location.pathname.includes("/tv/") ? "tv" : "movie";
 
@@ -114,6 +211,46 @@ function MovieDetailsPage() {
       .catch(() => setError("Failed to load details. Please try again."))
       .finally(() => setIsLoading(false));
   }, [id, mediaType]);
+
+  // Check if in watchlist when movie loads or user changes
+  useEffect(() => {
+    if (movie && user?.userId) {
+      checkWatchlistStatus();
+    }
+  }, [movie?.id, user?.userId, mediaType]);
+
+  const checkWatchlistStatus = async () => {
+    try {
+      const inWatchlist = await isInWatchlist(user.userId, id, mediaType);
+      setIsFavorite(inWatchlist);
+    } catch (error) {
+      console.error("Error checking watchlist:", error);
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      alert("Please login to add to watchlist");
+      navigate("/login");
+      return;
+    }
+
+    setIsToggling(true);
+    try {
+      if (isFavorite) {
+        await removeFromWatchlist(user.userId, id, mediaType);
+        setIsFavorite(false);
+      } else {
+        await addToWatchlist(user.userId, id, mediaType, movie);
+        setIsFavorite(true);
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      alert("Failed to update watchlist");
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   if (isLoading) return <SkeletonLoader />;
 
@@ -152,7 +289,10 @@ function MovieDetailsPage() {
   let runtime = "N/A";
   if (mediaType === "movie") {
     runtime = movie.runtime ? `${movie.runtime} min` : "N/A";
-  } else if (movie.episode_run_time?.length > 0 && movie.episode_run_time[0] > 0) {
+  } else if (
+    movie.episode_run_time?.length > 0 &&
+    movie.episode_run_time[0] > 0
+  ) {
     runtime = `${movie.episode_run_time[0]} min/ep`;
   }
 
@@ -188,7 +328,10 @@ function MovieDetailsPage() {
             alt={title}
             onLoad={() => setImgLoaded(true)}
           />
-          <div className="details-score" style={{ "--score-color": scoreColor }}>
+          <div
+            className="details-score"
+            style={{ "--score-color": scoreColor }}
+          >
             <span
               className={`details-score__num w-full h-full bg-[${scoreColor}] border-[${scoreColor}] border-6 justify-center items-center flex rounded-4xl`}
               style={{ color: scoreColor }}
@@ -203,7 +346,17 @@ function MovieDetailsPage() {
             {mediaType === "tv" ? "TV Series" : "Movie"}
           </span>
 
-          <h1 className="details-title">{title}</h1>
+          <div className="details-title-wrap">
+            <h1 className="details-title">{title}</h1>
+            <button
+              onClick={handleToggleFavorite}
+              disabled={isToggling}
+              className={`details-favorite-btn ${isFavorite ? "active" : ""}`}
+              title={isFavorite ? "Remove from watchlist" : "Add to watchlist"}
+            >
+              {isFavorite ? "♥" : "♡"}
+            </button>
+          </div>
 
           <div className="details-meta">
             <span className="meta-chip">{year}</span>
@@ -214,7 +367,9 @@ function MovieDetailsPage() {
               </span>
             )}
             {mediaType === "tv" && status && (
-              <span className={`meta-chip ${status === "Returning Series" ? "meta-chip--green" : ""}`}>
+              <span
+                className={`meta-chip ${status === "Returning Series" ? "meta-chip--green" : ""}`}
+              >
                 {status}
               </span>
             )}
@@ -223,7 +378,9 @@ function MovieDetailsPage() {
           {movie.genres?.length > 0 && (
             <div className="details-genres">
               {movie.genres.map((g) => (
-                <span key={g.id} className="genre-tag">{g.name}</span>
+                <span key={g.id} className="genre-tag">
+                  {g.name}
+                </span>
               ))}
             </div>
           )}
@@ -235,44 +392,53 @@ function MovieDetailsPage() {
             </p>
           </div>
 
-          {mediaType === "tv" && (numberOfSeasons || numberOfEpisodes || networks.length > 0) && (
-            <div className="tv-grid">
-              {numberOfSeasons && (
-                <div className="tv-grid__cell">
-                  <span className="tv-grid__label">Seasons</span>
-                  <span className="tv-grid__val">{numberOfSeasons}</span>
-                </div>
-              )}
-              {numberOfEpisodes && (
-                <div className="tv-grid__cell">
-                  <span className="tv-grid__label">Episodes</span>
-                  <span className="tv-grid__val">{numberOfEpisodes}</span>
-                </div>
-              )}
-              {networks[0] && (
-                <div className="tv-grid__cell">
-                  <span className="tv-grid__label">Network</span>
-                  <span className="tv-grid__val">{networks[0].name}</span>
-                </div>
-              )}
-              {lastAirDate && (
-                <div className="tv-grid__cell">
-                  <span className="tv-grid__label">Last Aired</span>
-                  <span className="tv-grid__val">
-                    {new Date(lastAirDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                  </span>
-                </div>
-              )}
-              {nextAirDate && (
-                <div className="tv-grid__cell">
-                  <span className="tv-grid__label">Next Ep</span>
-                  <span className="tv-grid__val">
-                    {new Date(nextAirDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
+          {mediaType === "tv" &&
+            (numberOfSeasons || numberOfEpisodes || networks.length > 0) && (
+              <div className="tv-grid">
+                {numberOfSeasons && (
+                  <div className="tv-grid__cell">
+                    <span className="tv-grid__label">Seasons</span>
+                    <span className="tv-grid__val">{numberOfSeasons}</span>
+                  </div>
+                )}
+                {numberOfEpisodes && (
+                  <div className="tv-grid__cell">
+                    <span className="tv-grid__label">Episodes</span>
+                    <span className="tv-grid__val">{numberOfEpisodes}</span>
+                  </div>
+                )}
+                {networks[0] && (
+                  <div className="tv-grid__cell">
+                    <span className="tv-grid__label">Network</span>
+                    <span className="tv-grid__val">{networks[0].name}</span>
+                  </div>
+                )}
+                {lastAirDate && (
+                  <div className="tv-grid__cell">
+                    <span className="tv-grid__label">Last Aired</span>
+                    <span className="tv-grid__val">
+                      {new Date(lastAirDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                )}
+                {nextAirDate && (
+                  <div className="tv-grid__cell">
+                    <span className="tv-grid__label">Next Ep</span>
+                    <span className="tv-grid__val">
+                      {new Date(nextAirDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
 
           {director && mediaType === "movie" && (
             <p className="details-credit">
@@ -292,7 +458,12 @@ function MovieDetailsPage() {
               rel="noopener noreferrer"
               className="trailer-btn"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
               Watch Trailer
@@ -316,7 +487,14 @@ function MovieDetailsPage() {
                     />
                   ) : (
                     <div className="cast-card__no-img">
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
                         <circle cx="12" cy="8" r="4" />
                         <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
                       </svg>

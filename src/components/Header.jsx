@@ -1,30 +1,52 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
-  const location = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location  = useNavigate ? useLocation() : { pathname: "/" };
+  const navigate  = useNavigate();
+  const { user, logout, loading } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  /* TODO: Replace with actual auth state from context/store */
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-
-  const isHomePage = location.pathname === "/";
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsMobileMenuOpen(false);
-    /* TODO: Add logout logic here */
+  const handleLogout = async () => {
+    await logout();
+    setMobileOpen(false);
+    navigate("/");
   };
 
-  const handleLogin = () => {
-    /* TODO: Add login logic here */
-    setIsMobileMenuOpen(false);
-  };
-
-  const handleSignUp = () => {
-    /* TODO: Add sign-up logic here */
-    setIsMobileMenuOpen(false);
-  };
+  // auth buttons — reused in desktop & mobile
+  const AuthButtons = ({ mobile = false }) =>
+    user ? (
+      <>
+        <Link
+          to="/watchlist"
+          className="nav-link watchlist-link"
+          onClick={() => mobile && setMobileOpen(false)}
+        >
+          📌 Watchlist
+        </Link>
+        <button onClick={handleLogout} className="btn btn-logout">
+          Logout
+        </button>
+      </>
+    ) : (
+      <>
+        <Link
+          to="/login"
+          className="btn btn-login"
+          onClick={() => mobile && setMobileOpen(false)}
+        >
+          Login
+        </Link>
+        <Link
+          to="/signup"
+          className="btn btn-signup"
+          onClick={() => mobile && setMobileOpen(false)}
+        >
+          Sign Up
+        </Link>
+      </>
+    );
 
   return (
     <navbar className="navbar">
@@ -34,83 +56,40 @@ export default function Header() {
           <img src="/zynema.svg" alt="Zynema Logo" className="logo-img" />
         </Link>
 
-        {/* Desktop Navigation */}
-        {/* <nav className="navbar-nav desktop-nav">
-          <Link to="/" className={`nav-link ${isHomePage ? "active" : ""}`}>
-            Home
-          </Link>
-          <a href="#trending" className="nav-link">
-            Trending
-          </a>
-          <a href="#explore" className="nav-link">
-            Explore
-          </a>
-        </nav> */}
+        {/* Desktop actions */}
+        {!loading && (
+          <div className="navbar-actions desktop-actions">
+            <AuthButtons />
+          </div>
+        )}
 
-        {/* Auth & Actions Section */}
-        <div className="navbar-actions desktop-actions">
-          {isLoggedIn ? (
-            <>
-              <Link to="/watchlist" className="nav-link watchlist-link">
-                📌 Watchlist
-              </Link>
-              <button onClick={handleLogout} className="btn btn-logout">
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <button onClick={handleLogin} className="btn btn-login">
-                Login
-              </button>
-              <button onClick={handleSignUp} className="btn btn-signup">
-                Sign Up
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Mobile Menu Button */}
+        {/* Mobile hamburger */}
         <button
           className="mobile-menu-btn"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onClick={() => setMobileOpen((o) => !o)}
           aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
         >
-          <span className="menu-icon"></span>
-          <span className="menu-icon"></span>
-          <span className="menu-icon"></span>
+          {/* animated bars → X */}
+          <span
+            className="menu-icon"
+            style={mobileOpen ? { transform: "rotate(45deg) translate(5px,5px)" } : {}}
+          />
+          <span
+            className="menu-icon"
+            style={mobileOpen ? { opacity: 0 } : {}}
+          />
+          <span
+            className="menu-icon"
+            style={mobileOpen ? { transform: "rotate(-45deg) translate(5px,-5px)" } : {}}
+          />
         </button>
 
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
+        {/* Mobile dropdown */}
+        {mobileOpen && !loading && (
           <nav className="navbar-nav mobile-nav">
-       
-    
-            {/* Mobile Auth Section */}
             <div className="navbar-actions mobile-actions">
-              {isLoggedIn ? (
-                <>
-                  <Link
-                    to="/watchlist"
-                    className="nav-link watchlist-link"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    📌 Watchlist
-                  </Link>
-                  <button onClick={handleLogout} className="btn btn-logout">
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button onClick={handleLogin} className="btn btn-login">
-                    Login
-                  </button>
-                  <button onClick={handleSignUp} className="btn btn-signup">
-                    Sign Up
-                  </button>
-                </>
-              )}
+              <AuthButtons mobile />
             </div>
           </nav>
         )}
