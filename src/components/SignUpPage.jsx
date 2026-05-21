@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signUp } from "../services/authService";
+import { signUp, getCurrentUser } from "@/services/authService";
 import { useAuth } from "../context/AuthContext";
 import "../styles/AuthPages.css";
 
@@ -34,7 +34,6 @@ export default function SignUpPage() {
     setLoading(true);
     try {
       await signUp(form.name, form.email, form.password);
-      const { getCurrentUser } = await import("../services/authService");
       const user = await getCurrentUser();
       setUser(user);
       navigate("/");

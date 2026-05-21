@@ -1,58 +1,27 @@
-import { useEffect, useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { getUserWatchlist, removeFromWatchlist } from "../appwrite";
+import { useWatchlist } from "@/context/WatchlistContext";
+import { getDetailPath } from "@/lib/tmdb";
+import { watchlistKey } from "@/lib/watchlistKeys";
 import "../styles/WatchlistPage.css";
 
 export default function WatchlistPage() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { items, loading, remove } = useWatchlist();
+  const [deletingKey, setDeletingKey] = useState(null);
+  const [filter, setFilter] = useState("all");
+  const [sort, setSort] = useState("newest");
 
   const handleBack = () => {
     if (window.history.length > 1) navigate(-1);
     else navigate("/");
   };
 
-  const [watchlist, setWatchlist] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [deletingKey, setDeletingKey] = useState(null);
-  const [filter, setFilter] = useState("all"); // all | movie | tv
-  // const [sort, setSort] = useState("newest"); // newest | oldest | rating
-
-  useEffect(() => {
-    if (!loading && !user) navigate("/login");
-  }, [user, loading, navigate]);
-
-  useEffect(() => {
-    if (user?.$id) fetchWatchlist();
-  }, [user?.$id]);
-
-  const fetchWatchlist = async () => {
-    try {
-      setIsLoading(true);
-      setError("");
-      const items = await getUserWatchlist(user.$id);
-      setWatchlist(items);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load watchlist.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleRemove = async (movieId, mediaType) => {
-    const key = `${movieId}-${mediaType}`;
+    const key = watchlistKey(movieId, mediaType);
     setDeletingKey(key);
     try {
-      await removeFromWatchlist(user.$id, Number(movieId), mediaType);
-      setWatchlist((prev) =>
-        prev.filter(
-          (item) =>
-            !(item.movieId === Number(movieId) && item.mediaType === mediaType),
-        ),
-      );
+      await remove(movieId, mediaType);
     } catch (err) {
       console.error(err);
     } finally {
@@ -60,52 +29,43 @@ export default function WatchlistPage() {
     }
   };
 
-  // ── Filter + Sort (client-side) ──────────────────
   const displayList = useMemo(() => {
-    let list = [...watchlist];
+    let list = [...items];
 
-    // filter
     if (filter !== "all") {
       list = list.filter((i) => i.mediaType === filter);
     }
 
-    // sort
-    // if (sort === "newest") {
-    //   list.sort(
-    //     (a, b) =>
-    //       new Date(b.addedDate || b.$createdAt) -
-    //       new Date(a.addedDate || a.$createdAt),
-    //   );
-    // } else if (sort === "oldest") {
-    //   list.sort(
-    //     (a, b) =>
-    //       new Date(a.addedDate || a.$createdAt) -
-    //       new Date(b.addedDate || b.$createdAt),
-    //   );
-    // } else if (sort === "rating") {
-    //   list.sort(
-    //     (a, b) => Number(b.vote_average || 0) - Number(a.vote_average || 0),
-    //   );
-    // }
+    if (sort === "newest") {
+      list.sort(
+        (a, b) =>
+          new Date(b.addedDate || b.$createdAt) -
+          new Date(a.addedDate || a.$createdAt),
+      );
+    } else if (sort === "oldest") {
+      list.sort(
+        (a, b) =>
+          new Date(a.addedDate || a.$createdAt) -
+          new Date(b.addedDate || b.$createdAt),
+      );
+    } else if (sort === "rating") {
+      list.sort(
+        (a, b) => Number(b.vote_average || 0) - Number(a.vote_average || 0),
+      );
+    }
 
     return list;
-  }, [watchlist, filter,]);
+  }, [items, filter, sort]);
 
-  const routePath = (item) =>
-    item.mediaType === "tv" ? `/tv/${item.movieId}` : `/movie/${item.movieId}`;
-
-  // ── Loading skeleton ──────────────────────────────
-  if (loading || isLoading) return <WatchlistSkeleton />;
-  if (!user) return null;
+  if (loading) return <WatchlistSkeleton />;
 
   return (
     <main className="wl-page">
       <div className="pattern" style={{ pointerEvents: "none" }} />
 
       <div className="wl-wrapper">
-        {/* ── Header ── */}
         <div className="wl-header">
-          <button onClick={handleBack} className="wl-back-btn">
+          <button type="button" onClick={handleBack} className="wl-back-btn">
             ←
           </button>
           <div className="wl-header__text">
@@ -113,15 +73,12 @@ export default function WatchlistPage() {
               My <span className="text-gradient">Watchlist</span>
             </h1>
             <p className="wl-count">
-              {watchlist.length} {watchlist.length === 1 ? "title" : "titles"}{" "}
-              saved
+              {items.length} {items.length === 1 ? "title" : "titles"} saved
             </p>
           </div>
         </div>
 
-        {/* ── Controls ── */}
         <div className="wl-controls">
-          {/* Filter tabs */}
           <div className="wl-filter-tabs">
             {[
               { value: "all", label: "All" },
@@ -130,46 +87,33 @@ export default function WatchlistPage() {
             ].map((tab) => (
               <button
                 key={tab.value}
+                type="button"
                 className={`wl-tab ${filter === tab.value ? "wl-tab--active" : ""}`}
                 onClick={() => setFilter(tab.value)}
               >
                 {tab.label}
-                {tab.value === "all" && (
-                  <span className="wl-tab__count">{watchlist.length}</span>
-                )}
-                {tab.value !== "all" && (
-                  <span className="wl-tab__count">
-                    {watchlist.filter((i) => i.mediaType === tab.value).length}
-                  </span>
-                )}
+                <span className="wl-tab__count">
+                  {tab.value === "all"
+                    ? items.length
+                    : items.filter((i) => i.mediaType === tab.value).length}
+                </span>
               </button>
             ))}
           </div>
 
-          {/* Sort select */}
-          {/* <select
+          <select
             className="wl-sort-select"
             value={sort}
             onChange={(e) => setSort(e.target.value)}
+            aria-label="Sort watchlist"
           >
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
             <option value="rating">Highest Rated</option>
-          </select> */}
+          </select>
         </div>
 
-        {/* ── Error ── */}
-        {error && (
-          <div className="wl-error">
-            <p>{error}</p>
-            <button onClick={fetchWatchlist} className="wl-retry-btn">
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {/* ── Empty ── */}
-        {!error && displayList.length === 0 && (
+        {displayList.length === 0 && (
           <div className="wl-empty">
             <div className="wl-empty__icon">
               <svg
@@ -195,7 +139,7 @@ export default function WatchlistPage() {
             </h2>
             <p className="wl-empty__sub">
               {filter === "all"
-                ? "Tap ♥ on any title to save it here."
+                ? "Tap the heart on any title to save it here."
                 : `Switch to "All" or add some ${filter === "tv" ? "series" : "movies"}.`}
             </p>
             {filter === "all" && (
@@ -206,11 +150,10 @@ export default function WatchlistPage() {
           </div>
         )}
 
-        {/* ── Grid ── */}
         {displayList.length > 0 && (
           <div className="movie-grid">
             {displayList.map((item) => {
-              const key = `${item.movieId}-${item.mediaType}`;
+              const key = watchlistKey(item.movieId, item.mediaType);
               const isDeleting = deletingKey === key;
               const score = Number(item.vote_average) || 0;
               const scoreClass =
@@ -222,7 +165,7 @@ export default function WatchlistPage() {
 
               return (
                 <Link
-                  to={routePath(item)}
+                  to={getDetailPath(item.mediaType, item.movieId)}
                   key={key}
                   style={{ textDecoration: "none" }}
                 >
@@ -237,17 +180,14 @@ export default function WatchlistPage() {
                         loading="lazy"
                       />
                       <div className="movie-card__overlay" aria-hidden="true" />
-
                       <span className="movie-card__type-badge">
                         {item.mediaType === "tv" ? "Series" : "Movie"}
                       </span>
-
                       <span className={`movie-card__score ${scoreClass}`}>
                         ★ {score > 0 ? score.toFixed(1) : "N/A"}
                       </span>
-
-                      {/* heart — always red/saved */}
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -291,7 +231,6 @@ export default function WatchlistPage() {
   );
 }
 
-/* ── Skeleton ────────────────────────────────────────── */
 function WatchlistSkeleton() {
   const sh = {
     background:

@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import axiosInstance from "../axiosConfig";
-import { useAuth } from "../context/AuthContext";
-import {
-  addToWatchlist,
-  removeFromWatchlist,
-  isInWatchlist,
-} from "../appwrite";
+import axiosInstance from "@/axiosConfig";
+import { useAuth } from "@/context/AuthContext";
+import { useWatchlist } from "@/context/WatchlistContext";
+import { getMediaTypeFromPath, posterUrl } from "@/lib/tmdb";
 
 /* ── Skeleton loader ── */
 function SkeletonLoader() {
@@ -192,14 +189,15 @@ function MovieDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { isSaved, toggle } = useWatchlist();
   const [movie, setMovie] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [imgLoaded, setImgLoaded] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
 
-  const mediaType = location.pathname.includes("/tv/") ? "tv" : "movie";
+  const mediaType = getMediaTypeFromPath(location.pathname);
+  const isFavorite = user?.$id ? isSaved(id, mediaType) : false;
 
   useEffect(() => {
     setIsLoading(true);
@@ -212,41 +210,17 @@ function MovieDetailsPage() {
       .finally(() => setIsLoading(false));
   }, [id, mediaType]);
 
-  // Check if in watchlist when movie loads or user changes
-  useEffect(() => {
-    if (movie && user?.userId) {
-      checkWatchlistStatus();
-    }
-  }, [movie?.id, user?.userId, mediaType]);
-
-  const checkWatchlistStatus = async () => {
-    try {
-      const inWatchlist = await isInWatchlist(user.$id, id, mediaType);
-      setIsFavorite(inWatchlist);
-    } catch (error) {
-      console.error("Error checking watchlist:", error);
-    }
-  };
-
   const handleToggleFavorite = async () => {
     if (!user) {
-      alert("Please login to add to watchlist");
       navigate("/login");
       return;
     }
 
     setIsToggling(true);
     try {
-      if (isFavorite) {
-        await removeFromWatchlist(user.$id, id, media_type);
-        setIsFavorite(false);
-      } else {
-        await addToWatchlist(user.$id, id, mediaType, movie);
-        setIsFavorite(true);
-      }
+      await toggle(id, mediaType, movie);
     } catch (error) {
-      console.error("Error toggling favorite:", error);
-      alert("Failed to update watchlist");
+      console.error("Error toggling watchlist:", error);
     } finally {
       setIsToggling(false);
     }
@@ -270,9 +244,7 @@ function MovieDetailsPage() {
   const backdropUrl = movie.backdrop_path
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
     : null;
-  const posterUrl = movie.poster_path
-    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-    : "/no-movie.svg";
+  const posterSrc = posterUrl(movie.poster_path);
 
   const trailer = movie.videos?.results?.find((v) => v.type === "Trailer");
   const director = movie.credits?.crew?.find((c) => c.job === "Director");
@@ -324,7 +296,7 @@ function MovieDetailsPage() {
         <div className={`details-poster-wrap ${imgLoaded ? "is-loaded" : ""}`}>
           <img
             className="details-poster"
-            src={posterUrl}
+            src={posterSrc}
             alt={title}
             onLoad={() => setImgLoaded(true)}
           />
@@ -333,7 +305,7 @@ function MovieDetailsPage() {
             style={{ "--score-color": scoreColor }}
           >
             <span
-              className={`details-score__num w-full h-full bg-[${scoreColor}] border-[${scoreColor}] border-6 justify-center items-center flex rounded-4xl`}
+              className="details-score__num"
               style={{ color: scoreColor }}
             >
               {movie.vote_average?.toFixed(1)}

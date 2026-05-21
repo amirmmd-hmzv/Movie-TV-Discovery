@@ -1,9 +1,7 @@
-import React from "react";
-
 const SkeletonCard = () => (
   <div
     role="status"
-    className="max-w-sm p-4   rounded-sm shadow-sm animate-pulse md:p-6 dark:border-gray-700"
+    className="max-w-sm p-4 rounded-sm shadow-sm animate-pulse md:p-6 dark:border-gray-700"
   >
     <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded-sm dark:bg-gray-700">
       <svg
@@ -17,16 +15,15 @@ const SkeletonCard = () => (
         <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
       </svg>
     </div>
-    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-    
+    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4" />
+    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
+    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
+    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700" />
     <span className="sr-only">Loading...</span>
   </div>
 );
 
-const SkeletonList = ({ count }) => {
+export default function SkeletonList({ count = 5 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {Array.from({ length: count }).map((_, index) => (
@@ -34,5 +31,4 @@ const SkeletonList = ({ count }) => {
       ))}
     </div>
   );
-};
-export default SkeletonList;
+}

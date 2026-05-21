@@ -23,6 +23,18 @@
   min-width: 150px;
 }
 
+.filter-group--disabled {
+  opacity: 0.4;
+}
+
+.filter-hint {
+  font-size: 0.7rem;
+  font-style: italic;
+  margin-left: 6px;
+  text-transform: none;
+  font-weight: 400;
+}
+
 .filter-label {
   font-size: 0.875rem;
   font-weight: 600;

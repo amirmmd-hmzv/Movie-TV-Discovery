@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../axiosConfig";
+import axiosInstance from "@/axiosConfig";
+import { getDetailPath, getDisplayTitle, posterUrl } from "@/lib/tmdb";
 import "@/styles/HeroPosterStack.css";
 
 function HeroPosterStack() {
@@ -19,11 +20,9 @@ function HeroPosterStack() {
       .catch(console.error);
   }, []);
 
-  const BASE = "https://image.tmdb.org/t/p/w500";
-
   const handleClick = (item) => {
     if (!item) return;
-    navigate(`/${item.media_type}/${item.id}`);
+    navigate(getDetailPath(item.media_type, item.id));
   };
 
   return (
@@ -36,12 +35,12 @@ function HeroPosterStack() {
           role={item ? "link" : undefined}
           tabIndex={item ? 0 : undefined}
           onKeyDown={(e) => e.key === "Enter" && handleClick(item)}
-          title={item?.title || item?.name || ""}
+          title={getDisplayTitle(item)}
         >
           {item?.poster_path ? (
             <img
-              src={BASE + item.poster_path}
-              alt={item.title || item.name || ""}
+              src={posterUrl(item.poster_path)}
+              alt={getDisplayTitle(item)}
               draggable={false}
             />
           ) : (

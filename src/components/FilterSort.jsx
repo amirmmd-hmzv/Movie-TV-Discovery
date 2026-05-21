@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import axiosInstance from "@/axiosConfig";
+import { getSortOptions } from "@/lib/tmdb";
 import "../styles/FilterSort.css";
 
 function FilterSort({
@@ -11,74 +14,70 @@ function FilterSort({
   setYearFilter,
   isSearchMode = false,
 }) {
-  // ✅ fix: مقادیر درست TMDB — "rating" وجود نداره، باید "vote_average" باشه
-  const sortOptions = [
-    { value: "popularity.desc", label: "Popularity (High to Low)" },
-    { value: "popularity.asc", label: "Popularity (Low to High)" },
-    { value: "vote_average.desc", label: "Rating (High to Low)" },
-    { value: "vote_average.asc", label: "Rating (Low to High)" },
-    { value: "release_date.desc", label: "Release Date (Newest)" },
-    { value: "release_date.asc", label: "Release Date (Oldest)" },
-  ];
-
-  const genreOptions = [
+  const sortOptions = getSortOptions(mediaType);
+  const [genreOptions, setGenreOptions] = useState([
     { value: "", label: "All Genres" },
-    { value: "28", label: "Action" },
-    { value: "12", label: "Adventure" },
-    { value: "16", label: "Animation" },
-    { value: "35", label: "Comedy" },
-    { value: "80", label: "Crime" },
-    { value: "99", label: "Documentary" },
-    { value: "18", label: "Drama" },
-    { value: "10751", label: "Family" },
-    { value: "14", label: "Fantasy" },
-    { value: "36", label: "History" },
-    { value: "27", label: "Horror" },
-    { value: "10402", label: "Music" },
-    { value: "9648", label: "Mystery" },
-    { value: "10749", label: "Romance" },
-    { value: "878", label: "Science Fiction" },
-    { value: "10770", label: "TV Movie" },
-    { value: "53", label: "Thriller" },
-    { value: "10752", label: "War" },
-    { value: "37", label: "Western" },
-  ];
+  ]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    axiosInstance
+      .get(`/genre/${mediaType}/list`, { signal: controller.signal })
+      .then((res) => {
+        const genres = (res.data.genres || [])
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((g) => ({ value: String(g.id), label: g.name }));
+        setGenreOptions([{ value: "", label: "All Genres" }, ...genres]);
+      })
+      .catch((err) => {
+        if (err.code !== "ERR_CANCELED") {
+          console.error("Failed to load genres:", err);
+        }
+      });
+
+    return () => controller.abort();
+  }, [mediaType]);
 
   const currentYear = new Date().getFullYear();
   const yearOptions = [
     { value: "", label: "All Years" },
     ...Array.from({ length: 30 }, (_, i) => ({
-      value: currentYear - i,
+      value: String(currentYear - i),
       label: currentYear - i,
     })),
   ];
 
+  const exploreOnly = isSearchMode ? (
+    <span className="filter-hint">(Explore only)</span>
+  ) : null;
+
   return (
     <div className="filter-sort-container">
       <div className="filter-sort-wrapper">
-        {/* Media Type Toggle — همیشه فعال، حتی در سرچ */}
         <div className="filter-group">
-          <label className="filter-label">Content Type</label>
+          <span className="filter-label">Content Type</span>
           <div className="media-type-toggle">
             <button
+              type="button"
               className={`toggle-btn ${mediaType === "movie" ? "active" : ""}`}
               onClick={() => setMediaType("movie")}
             >
-              🎬 Movies
+              Movies
             </button>
             <button
+              type="button"
               className={`toggle-btn ${mediaType === "tv" ? "active" : ""}`}
               onClick={() => setMediaType("tv")}
             >
-              📺 Series
+              Series
             </button>
           </div>
         </div>
 
-        {/* Sort — در سرچ غیرفعاله */}
-        <div className="filter-group" style={{ opacity: isSearchMode ? 0.4 : 1 }}>
+        <div className={`filter-group ${isSearchMode ? "filter-group--disabled" : ""}`}>
           <label htmlFor="sort" className="filter-label">
-            Sort By{isSearchMode && <span style={{ fontSize: "0.7rem", fontStyle: "italic", marginLeft: "6px" }}>(Explore only)</span>}
+            Sort By {exploreOnly}
           </label>
           <select
             id="sort"
@@ -95,10 +94,9 @@ function FilterSort({
           </select>
         </div>
 
-        {/* Genre — در سرچ غیرفعاله */}
-        <div className="filter-group" style={{ opacity: isSearchMode ? 0.4 : 1 }}>
+        <div className={`filter-group ${isSearchMode ? "filter-group--disabled" : ""}`}>
           <label htmlFor="genre" className="filter-label">
-            Genre{isSearchMode && <span style={{ fontSize: "0.7rem", fontStyle: "italic", marginLeft: "6px" }}>(Explore only)</span>}
+            Genre {exploreOnly}
           </label>
           <select
             id="genre"
@@ -108,17 +106,16 @@ function FilterSort({
             disabled={isSearchMode}
           >
             {genreOptions.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value || "all"} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Year — در سرچ غیرفعاله */}
-        <div className="filter-group" style={{ opacity: isSearchMode ? 0.4 : 1 }}>
+        <div className={`filter-group ${isSearchMode ? "filter-group--disabled" : ""}`}>
           <label htmlFor="year" className="filter-label">
-            Release Year{isSearchMode && <span style={{ fontSize: "0.7rem", fontStyle: "italic", marginLeft: "6px" }}>(Explore only)</span>}
+            {mediaType === "tv" ? "First Air Year" : "Release Year"} {exploreOnly}
           </label>
           <select
             id="year"
@@ -128,15 +125,15 @@ function FilterSort({
             disabled={isSearchMode}
           >
             {yearOptions.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value || "all"} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Reset */}
         <button
+          type="button"
           className="reset-btn"
           onClick={() => {
             setSortBy("popularity.desc");
@@ -146,7 +143,7 @@ function FilterSort({
           }}
           title="Reset all filters"
         >
-          ↻ Reset
+          Reset
         </button>
       </div>
     </div>

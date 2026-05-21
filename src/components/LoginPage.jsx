@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signIn } from "../services/authService";
+import { signIn, getCurrentUser } from "@/services/authService";
 import { useAuth } from "../context/AuthContext";
 import "@/styles/AuthPages.css";
 
@@ -21,7 +21,6 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signIn(form.email, form.password);
-      const { getCurrentUser } = await import("../services/authService");
       const user = await getCurrentUser();
       setUser(user);
       navigate("/");

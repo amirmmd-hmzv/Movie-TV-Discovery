@@ -1,13 +1,10 @@
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import {
-  addToWatchlist,
-  removeFromWatchlist,
-  isInWatchlist,
-} from "../appwrite";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useWatchlist } from "@/context/WatchlistContext";
+import { getDetailPath, posterUrl } from "@/lib/tmdb";
 
-const MovieCard = ({
+export default function MovieCard({
   movie: {
     id,
     media_type,
@@ -20,65 +17,48 @@ const MovieCard = ({
     original_language,
     ...movieData
   },
-}) => {
+}) {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isSaved, toggle } = useWatchlist();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if in watchlist on mount
-  useEffect(() => {
-    if (user?.$id) checkWatchlist();
-  }, [user?.$id, id, media_type]);
-
-  const checkWatchlist = async () => {
-    try {
-      const inWatchlist = await isInWatchlist(user.$id, id, media_type);
-      setIsFavorite(inWatchlist);
-    } catch (error) {
-      console.error("Error checking watchlist:", error);
-    }
-  };
+  const isFavorite = user?.$id ? isSaved(id, media_type) : false;
 
   const handleToggleFavorite = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!user) {
-      alert("Please login to add to watchlist");
+      navigate("/login");
       return;
     }
 
     setIsLoading(true);
     try {
-      if (isFavorite) {
-        await removeFromWatchlist(user.$id, id, media_type);
-        setIsFavorite(false);
-      } else {
-        await addToWatchlist(user.$id, id, media_type, {
-          title: title || name,
-          poster_path,
-          vote_average,
-          overview: movieData.overview,
-          release_date,
-          first_air_date,
-          media_type,
-          ...movieData,
-        });
-        setIsFavorite(true);
-      }
+      await toggle(id, media_type, {
+        title: title || name,
+        name,
+        poster_path,
+        vote_average,
+        overview: movieData.overview,
+        release_date,
+        first_air_date,
+        ...movieData,
+      });
     } catch (error) {
-      console.error("Error toggling favorite:", error);
+      console.error("Error toggling watchlist:", error);
     } finally {
       setIsLoading(false);
     }
   };
+
   const displayTitle = title || name;
   const displayDate = release_date || first_air_date;
   const year = displayDate ? displayDate.split("-")[0] : "N/A";
-  const routePath = media_type === "tv" ? `/tv/${id}` : `/movie/${id}`;
+  const routePath = getDetailPath(media_type, id);
   const score = vote_average ? vote_average.toFixed(1) : "N/A";
 
-  // رنگ امتیاز بر اساس مقدار
   const scoreClass =
     vote_average >= 7.5
       ? "score--high"
@@ -89,32 +69,20 @@ const MovieCard = ({
   return (
     <Link to={routePath} className="movie-card-link">
       <article className="movie-card">
-        {/* ── Poster ── */}
         <div className="movie-card__poster-wrap">
           <img
             className="movie-card__poster"
-            src={
-              poster_path
-                ? `https://image.tmdb.org/t/p/w500/${poster_path}`
-                : "/no-movie.svg"
-            }
+            src={posterUrl(poster_path)}
             alt={displayTitle}
             loading="lazy"
           />
-
-          {/* overlay روی hover */}
           <div className="movie-card__overlay" aria-hidden="true" />
-
-          {/* نوع محتوا — گوشه بالا چپ */}
           <span className="movie-card__type-badge">
             {media_type === "tv" ? "Series" : "Movie"}
           </span>
-
-          {/* امتیاز — گوشه بالا راست */}
           <span className={`movie-card__score ${scoreClass}`}>★ {score}</span>
-
-          {/* Favorite Heart Button — گوشه پایین راست */}
           <button
+            type="button"
             onClick={handleToggleFavorite}
             disabled={isLoading}
             className={`movie-card__favorite-btn ${isFavorite ? "active" : ""}`}
@@ -124,10 +92,8 @@ const MovieCard = ({
           </button>
         </div>
 
-        {/* ── Info ── */}
         <div className="movie-card__info">
           <h3 className="movie-card__title">{displayTitle}</h3>
-
           <div className="movie-card__meta">
             <span className="movie-card__lang">
               {original_language?.toUpperCase()}
@@ -137,11 +103,8 @@ const MovieCard = ({
           </div>
         </div>
 
-        {/* shine sweep on hover */}
         <div className="movie-card__shine" aria-hidden="true" />
       </article>
     </Link>
   );
-};
-
-export default MovieCard;
+}

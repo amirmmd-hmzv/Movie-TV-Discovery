@@ -1134,11 +1134,26 @@
   padding: 2rem 1rem;
 }
 
+.no-results-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #ffd93d;
+  color: #000;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.no-results-btn:hover {
+  filter: brightness(1.05);
+}
+
 /* ═══════════════════════════════════════
    Navbar Component
 ═══════════════════════════════════════ */
 
-navbar {
+.navbar {
   position: fixed;
   width: 100%;
   top: 0;
