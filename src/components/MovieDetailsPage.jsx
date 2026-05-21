@@ -221,7 +221,7 @@ function MovieDetailsPage() {
 
   const checkWatchlistStatus = async () => {
     try {
-      const inWatchlist = await isInWatchlist(user.userId, id, mediaType);
+      const inWatchlist = await isInWatchlist(user.$id, id, mediaType);
       setIsFavorite(inWatchlist);
     } catch (error) {
       console.error("Error checking watchlist:", error);
@@ -238,10 +238,10 @@ function MovieDetailsPage() {
     setIsToggling(true);
     try {
       if (isFavorite) {
-        await removeFromWatchlist(user.userId, id, mediaType);
+        await removeFromWatchlist(user.$id, id, media_type);
         setIsFavorite(false);
       } else {
-        await addToWatchlist(user.userId, id, mediaType, movie);
+        await addToWatchlist(user.$id, id, mediaType, movie);
         setIsFavorite(true);
       }
     } catch (error) {

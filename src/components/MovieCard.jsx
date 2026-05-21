@@ -27,14 +27,12 @@ const MovieCard = ({
 
   // Check if in watchlist on mount
   useEffect(() => {
-    if (user?.userId) {
-      checkWatchlist();
-    }
-  }, [user?.userId, id, media_type]);
+    if (user?.$id) checkWatchlist();
+  }, [user?.$id, id, media_type]);
 
   const checkWatchlist = async () => {
     try {
-      const inWatchlist = await isInWatchlist(user.userId, id, media_type);
+      const inWatchlist = await isInWatchlist(user.$id, id, media_type);
       setIsFavorite(inWatchlist);
     } catch (error) {
       console.error("Error checking watchlist:", error);
@@ -53,10 +51,10 @@ const MovieCard = ({
     setIsLoading(true);
     try {
       if (isFavorite) {
-        await removeFromWatchlist(user.userId, id, media_type);
+        await removeFromWatchlist(user.$id, id, media_type);
         setIsFavorite(false);
       } else {
-        await addToWatchlist(user.userId, id, media_type, {
+        await addToWatchlist(user.$id, id, media_type, {
           title: title || name,
           poster_path,
           vote_average,

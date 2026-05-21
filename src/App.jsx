@@ -307,7 +307,9 @@ function HomePage() {
 }
 
 function App() {
-  const { user } = useAuth();
+  const { user ,$id} = useAuth();
+  
+  console.log($id)
   console.log(user)
   return (
     <Router>
