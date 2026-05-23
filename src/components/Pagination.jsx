@@ -1,6 +1,4 @@
-import "../styles/Pagination.css";
-
-// TMDB هیچ‌وقت بیشتر از 500 صفحه رو قبول نمیکنه
+// TMDB never returns more than 500 pages per endpoint
 const TMDB_MAX_PAGE = 500;
 
 function Pagination({ currentPage, setCurrentPage, totalPages, isLoading }) {

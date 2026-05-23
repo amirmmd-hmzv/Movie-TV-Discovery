@@ -1,7 +1,10 @@
+/**
+ * FilterSort — discover controls (media type, sort, genre, year).
+ * Genre list is fetched from TMDB when media type changes.
+ */
 import { useEffect, useState } from "react";
 import axiosInstance from "@/axiosConfig";
 import { getSortOptions } from "@/lib/tmdb";
-import "../styles/FilterSort.css";
 
 function FilterSort({
   sortBy,

@@ -1,3 +1,7 @@
+/**
+ * HomePage — search, discover filters, trending searches, paginated grid.
+ * Filter state persists in sessionStorage (see sessionStorageManager).
+ */
 import { useEffect, useState } from "react";
 import { useDebounce } from "react-use";
 import Search from "@/components/Search";

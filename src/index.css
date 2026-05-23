@@ -1,3 +1,15 @@
+/**
+ * Zynema — global stylesheet (Tailwind CSS v4)
+ *
+ * Structure:
+ *   1. Fonts + @import "tailwindcss"
+ *   2. @theme — design tokens (colors, fonts)
+ *   3. @layer base — element defaults
+ *   4. Component blocks — home, cards, details, navbar
+ *   5. @import "./index.components.css" — auth, filters, watchlist, etc.
+ *
+ * Edit split files: index.css (layout) | index.components.css (feature UI)
+ */
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
 
@@ -1422,82 +1434,26 @@
 }
 
 /* ═══════════════════════════════════════
-   Watchlist Page Styles
+   Route lazy-loading fallback
 ═══════════════════════════════════════ */
 
-.watchlist-page {
-  position: relative;
-  min-height: 100vh;
-  width: 100%;
-  background: var(--color-primary);
-  padding-top: 2rem;
-}
-
-.watchlist-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem 3rem;
-  position: relative;
-  z-index: 10;
-}
-
-.watchlist-header {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.watchlist-title {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: var(--color-light-100);
-}
-
-.watchlist-title .text-gradient {
-  background: linear-gradient(
-    90deg,
-    var(--color-accent) 0%,
-    var(--color-highlight) 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.watchlist-count {
-  font-size: 1.1rem;
-  color: var(--color-light-200);
-  font-weight: 600;
-}
-
-.watchlist-error {
-  background: rgba(255, 76, 41, 0.15);
-  border: 1px solid rgba(255, 76, 41, 0.3);
-  color: var(--color-highlight);
-  padding: 1rem 1.5rem;
-  border-radius: 0.75rem;
-  margin-bottom: 2rem;
-  text-align: center;
-  font-weight: 600;
-}
-
-.watchlist-loading {
+.route-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 50vh;
   gap: 1rem;
   color: var(--color-light-100);
 }
 
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 217, 61, 0.2);
+.route-loading__spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(255, 217, 61, 0.2);
   border-top-color: var(--color-accent);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.9s linear infinite;
 }
 
 @keyframes spin {
@@ -1506,183 +1462,9 @@
   }
 }
 
-/* Empty State */
-.watchlist-empty {
-  text-align: center;
-  padding: 4rem 1rem;
-}
+/* ═══════════════════════════════════════
+   Component styles (FilterSort, Auth, etc.)
+   Merged from src/styles/ — edit index.components.css
+═══════════════════════════════════════ */
 
-.empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-
-.watchlist-empty h2 {
-  font-size: 1.8rem;
-  color: var(--color-light-100);
-  margin-bottom: 0.5rem;
-  font-weight: 700;
-}
-
-.watchlist-empty p {
-  color: var(--color-light-200);
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
-}
-
-/* Watchlist Grid */
-.watchlist-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 2rem;
-}
-
-@media (max-width: 768px) {
-  .watchlist-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .watchlist-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 1rem;
-  }
-}
-
-/* Watchlist Card */
-.watchlist-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.watchlist-card__poster-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  background: rgba(255, 217, 61, 0.05);
-  border: 1px solid rgba(255, 217, 61, 0.1);
-  transition: all 0.3s ease;
-}
-
-.watchlist-card__poster-wrap:hover {
-  border-color: rgba(255, 217, 61, 0.3);
-  box-shadow: 0 8px 24px rgba(255, 217, 61, 0.2);
-}
-
-.watchlist-card__poster-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-.watchlist-card__poster-wrap:hover img {
-  transform: scale(1.05);
-}
-
-.watchlist-card__type {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(0, 0, 0, 0.7);
-  color: var(--color-accent);
-  padding: 0.35rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.watchlist-card__rating {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.7);
-  color: var(--color-accent);
-  padding: 0.35rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.watchlist-card__remove {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255, 76, 41, 0.2);
-  border: 2px solid var(--color-highlight);
-  color: var(--color-highlight);
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.watchlist-card__remove:hover:not(:disabled) {
-  background: rgba(255, 76, 41, 0.3);
-  transform: scale(1.1);
-  box-shadow: 0 0 12px rgba(255, 76, 41, 0.4);
-}
-
-.watchlist-card__remove:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.watchlist-card__info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.watchlist-card__title-link {
-  text-decoration: none;
-}
-
-.watchlist-card__title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-light-100);
-  line-height: 1.3;
-  margin: 0;
-  transition: color 0.3s ease;
-}
-
-.watchlist-card__title-link:hover .watchlist-card__title {
-  color: var(--color-accent);
-}
-
-.watchlist-card__overview {
-  font-size: 0.85rem;
-  color: var(--color-light-200);
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  margin: 0;
-}
-
-.watchlist-card__meta {
-  display: flex;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--color-light-200);
-}
-
-.watchlist-card__date {
-  font-weight: 500;
-}
+@import "./index.components.css";

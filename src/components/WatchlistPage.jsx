@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { useWatchlist } from "@/context/WatchlistContext";
 import { getDetailPath } from "@/lib/tmdb";
 import { watchlistKey } from "@/lib/watchlistKeys";
-import "../styles/WatchlistPage.css";
 
 export default function WatchlistPage() {
   const navigate = useNavigate();

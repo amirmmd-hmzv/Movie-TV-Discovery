@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import '@/styles/Errorview.css'
+
 /**
  * ErrorView — نمایش خطا با UI بهتر
  * Props:

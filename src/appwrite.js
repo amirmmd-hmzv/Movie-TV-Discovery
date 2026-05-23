@@ -1,3 +1,7 @@
+/**
+ * Appwrite database operations — trending searches + per-user watchlist.
+ * Collection permissions must restrict writes by authenticated user (see README).
+ */
 import { Databases, ID, Query } from "appwrite";
 import {
   appwriteClient,

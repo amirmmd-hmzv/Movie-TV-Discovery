@@ -1,6 +1,5 @@
 /**
- * AuthContext.jsx
- * Global auth state — هر جای اپ بهش دسترسی داری
+ * AuthContext — global Appwrite session state (user, login, logout).
  */
 import { createContext, useContext, useEffect, useState } from "react";
 import { getCurrentUser, signOut } from "../services/authService";

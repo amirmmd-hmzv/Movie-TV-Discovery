@@ -1,3 +1,6 @@
+/**
+ * TMDB discover + search API layer (via axiosConfig → api.themoviedb.org).
+ */
 import axiosInstance from "@/axiosConfig";
 import { SEARCH_MAX_PAGE, TMDB_MAX_PAGE } from "@/lib/tmdb";
 

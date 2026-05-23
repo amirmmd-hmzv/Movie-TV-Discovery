@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/axiosConfig";
 import { getDetailPath, getDisplayTitle, posterUrl } from "@/lib/tmdb";
-import "@/styles/HeroPosterStack.css";
 
 function HeroPosterStack() {
   const [posters, setPosters] = useState([null, null, null]);

@@ -1,3 +1,7 @@
+/**
+ * WatchlistContext — single source of truth for saved titles.
+ * Loads the user's watchlist once (avoids N+1 Appwrite calls per MovieCard).
+ */
 import {
   createContext,
   useCallback,

@@ -1,3 +1,8 @@
+/**
+ * App entry — providers wrap routing tree:
+ *   AuthProvider → session/user
+ *   WatchlistProvider → saved titles (depends on auth)
+ */
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";

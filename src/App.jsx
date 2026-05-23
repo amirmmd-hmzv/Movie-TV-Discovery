@@ -1,46 +1,54 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "@/pages/HomePage";
-import MovieDetailsPage from "@/components/MovieDetailsPage";
 import Header from "@/components/Header";
-import LoginPage from "@/components/LoginPage";
-import SignUpPage from "@/components/SignUpPage";
-import WatchlistPage from "@/components/WatchlistPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import GuestRoute from "@/components/GuestRoute";
+import RouteLoading from "@/components/RouteLoading";
+
+/** Home stays eager — first paint / SEO-critical route */
+import HomePage from "@/pages/HomePage";
+
+/** Code-split secondary routes to reduce initial bundle size */
+const LoginPage = lazy(() => import("@/components/LoginPage"));
+const SignUpPage = lazy(() => import("@/components/SignUpPage"));
+const MovieDetailsPage = lazy(() => import("@/components/MovieDetailsPage"));
+const WatchlistPage = lazy(() => import("@/components/WatchlistPage"));
 
 function App() {
   return (
     <Router>
       <Header />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/login"
-          element={
-            <GuestRoute>
-              <LoginPage />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <GuestRoute>
-              <SignUpPage />
-            </GuestRoute>
-          }
-        />
-        <Route path="/movie/:id" element={<MovieDetailsPage />} />
-        <Route path="/tv/:id" element={<MovieDetailsPage />} />
-        <Route
-          path="/watchlist"
-          element={
-            <ProtectedRoute>
-              <WatchlistPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <Suspense fallback={<RouteLoading />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/login"
+            element={
+              <GuestRoute>
+                <LoginPage />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <GuestRoute>
+                <SignUpPage />
+              </GuestRoute>
+            }
+          />
+          <Route path="/movie/:id" element={<MovieDetailsPage />} />
+          <Route path="/tv/:id" element={<MovieDetailsPage />} />
+          <Route
+            path="/watchlist"
+            element={
+              <ProtectedRoute>
+                <WatchlistPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

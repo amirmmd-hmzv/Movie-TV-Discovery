@@ -1,16 +1,90 @@
-# React + Vite
+# Zynema — Movie & TV Discovery App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React portfolio app to **discover movies and TV series**, **search** with debounce, **filter & sort** via TMDB, **sign in with Appwrite**, and save titles to a **personal watchlist**.
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?logo=tailwindcss)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Screenshots
 
-## React Compiler
+> Add your own images under `docs/screenshots/` (see [docs/screenshots/README.md](docs/screenshots/README.md)).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Home | Details | Watchlist |
+|------|---------|-----------|
+| ![Home](docs/screenshots/home.png) | ![Details](docs/screenshots/details.png) | ![Watchlist](docs/screenshots/watchlist.png) |
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Browse **movies** and **TV series** (discover + search)
+- **Sort** by popularity, rating, release / first-air date
+- **Genre** and **year** filters (media-specific genre lists from TMDB)
+- **Trending searches** stored in Appwrite
+- **Auth** — email/password sign-up & login (Appwrite)
+- **Watchlist** — add/remove titles; filter & sort saved items
+- **Code-split routes** — lazy-loaded pages for a smaller initial bundle
+
+## Tech stack
+
+| Layer | Choice |
+|-------|--------|
+| UI | React 19, React Router 7 |
+| Build | Vite 7 |
+| Styling | Tailwind CSS v4 |
+| Data | TMDB API, Appwrite (auth + DB) |
+| HTTP | Axios |
+
+## Project structure
+
+```
+movie-app/
+├── src/
+│   ├── index.css              # Global styles + Tailwind theme
+│   ├── index.components.css   # Auth, filters, pagination, watchlist
+│   ├── pages/HomePage.jsx
+│   ├── components/
+│   ├── context/
+│   ├── services/
+│   └── appwrite.js
+├── docs/screenshots/
+└── .env.example
+```
+
+## Environment variables
+
+Copy `.env.example` to `.env` (or `.env.local`):
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_TMDB_API_KEY` | TMDB v4 read access token |
+| `VITE_APPWRITE_*` | Appwrite endpoint, project, database, collection IDs |
+
+> For a portfolio/demo, the TMDB key is used from the client via Vite env vars. Do not commit `.env` to git.
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Production build → `dist/` |
+| `npm run preview` | Preview production build |
+
+### Development
+
+```bash
+npm install
+cp .env.example .env
+# Add VITE_TMDB_API_KEY and Appwrite IDs
+
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173).
+
+## Appwrite setup (summary)
+
+See collections in previous docs: **trending searches** + **watchlist**, with permissions so users only access their own watchlist rows.
+
+## License
+
+Private portfolio project.
