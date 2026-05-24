@@ -11,6 +11,7 @@ import Pagination from "@/components/Pagination";
 import SkeletonList from "@/components/SkeletonCard";
 import ErrorView from "@/components/Errorview";
 import HeroPosterStack from "@/components/HeroPosterStack";
+import TrendingSearches from "@/components/TrendingSearches";
 import { getTrendingMovies, updateSearchCount } from "@/appwrite";
 import { fetchMoviesList } from "@/services/movieService";
 import {
@@ -111,16 +112,19 @@ export default function HomePage() {
       setHasNoResults(false);
 
       try {
-        const { results, totalPages: pages, pageEmpty } =
-          await fetchMoviesList({
-            query: debouncedValue,
-            page: safePage,
-            mediaType,
-            sortBy,
-            genreFilter,
-            yearFilter,
-            signal: controller.signal,
-          });
+        const {
+          results,
+          totalPages: pages,
+          pageEmpty,
+        } = await fetchMoviesList({
+          query: debouncedValue,
+          page: safePage,
+          mediaType,
+          sortBy,
+          genreFilter,
+          yearFilter,
+          signal: controller.signal,
+        });
 
         if (controller.signal.aborted) return;
 
@@ -176,36 +180,7 @@ export default function HomePage() {
           </h1>
           <Search setSearchTerm={setSearchTerm} searchTerm={searchTerm} />
 
-          {trendingSearches.length > 0 && (
-            <section className="trending">
-              <div className="trending-header">
-                <div className="trending-bar" />
-                <h2>Trending Searches</h2>
-                <span className="trending-badge">Live</span>
-              </div>
-              <ul>
-                {trendingSearches.map((movie, index) => (
-                  <li key={movie.$id}>
-                    <span className="rank">{index + 1}</span>
-                    <div className="poster-wrap">
-                      <img src={movie.poster_url} alt={movie.title} />
-                      <div className="poster-overlay">
-                        {movie.title ?? movie.searchTerm}
-                      </div>
-                      {movie.count && (
-                        <span className="count-pill">
-                          {movie.count >= 1000
-                            ? `${(movie.count / 1000).toFixed(1).replace(/\.0$/, "")}k`
-                            : movie.count}{" "}
-                          searches
-                        </span>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <TrendingSearches trendingSearches={trendingSearches} />
         </header>
 
         <section className="all-movies">

@@ -7,6 +7,7 @@ import RouteLoading from "@/components/RouteLoading";
 
 /** Home stays eager — first paint / SEO-critical route */
 import HomePage from "@/pages/HomePage";
+import NotFoundPage from "@/components/NotFoundPage";
 
 /** Code-split secondary routes to reduce initial bundle size */
 const LoginPage = lazy(() => import("@/components/LoginPage"));
@@ -47,6 +48,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* 1. This MUST be the last route in the list */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </Router>
