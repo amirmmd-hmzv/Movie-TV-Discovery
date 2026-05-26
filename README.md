@@ -12,7 +12,7 @@ A React portfolio app to **discover movies and TV series**, **search** with debo
 
 | Home | Details | Watchlist |
 |------|---------|-----------|
-| ![Home](docs/screenshots/home.png) | ![Details](docs/screenshots/details.png) | ![Watchlist](docs/screenshots/watchlist.png) |
+| ![Home](/screenshots/home.png) | ![Details](docs/screenshots/details.png) | ![Watchlist](docs/screenshots/watchlist.png) |
 
 ## Features
 
