@@ -1,19 +1,19 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "@/components/Header";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import GuestRoute from "@/components/GuestRoute";
-import RouteLoading from "@/components/RouteLoading";
+import ProtectedRoute from "@/components/Routes/ProtectedRoute";
+import GuestRoute from "@/components/Routes/GuestRoute";
+import RouteLoading from "@/components/Routes/RouteLoading";
 
 /** Home stays eager — first paint / SEO-critical route */
 import HomePage from "@/pages/HomePage";
-import NotFoundPage from "@/components/NotFoundPage";
+import NotFoundPage from "@/pages/NotFound/NotFoundPage";
 
 /** Code-split secondary routes to reduce initial bundle size */
-const LoginPage = lazy(() => import("@/components/LoginPage"));
-const SignUpPage = lazy(() => import("@/components/SignUpPage"));
-const MovieDetailsPage = lazy(() => import("@/components/MovieDetailsPage"));
-const WatchlistPage = lazy(() => import("@/components/WatchlistPage"));
+const LoginPage = lazy(() => import("@/pages/Auth/LoginPage"));
+const SignUpPage = lazy(() => import("@/pages/Auth/SignUpPage"));
+const MovieDetailsPage = lazy(() => import("@/pages/Details/MovieDetailsPage"));
+const WatchlistPage = lazy(() => import("@/pages/Watchlist/WatchlistPage"));
 
 function App() {
   return (

@@ -51,7 +51,11 @@ export default function HomePage() {
 
   useDebounce(
     () => {
-      // اولین بار که mount میشه، debounce رو skip کن
+      /**
+       * Optimization: Skip debounce on initial mount
+       * This allows immediate search results without waiting 800ms
+       * After first render, normal debouncing applies (800ms delay)
+       */
       if (!isMountedRef.current) {
         isMountedRef.current = true;
         return;

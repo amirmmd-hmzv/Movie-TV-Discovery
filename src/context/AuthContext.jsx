@@ -10,7 +10,11 @@ export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // اول بار چک کن session زنده هست یا نه
+  /**
+   * Check if user session is still valid on component mount
+   * Fetch current user from Appwrite and update state
+   * Always sets loading to false after check (success or failure)
+   */
   useEffect(() => {
     getCurrentUser()
       .then(setUser)
