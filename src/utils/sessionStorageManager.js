@@ -1,20 +1,36 @@
-/**
- * SessionStorage Utility Functions
- * Manages persistence of filters, search, and pagination state
- */
-
-const STORAGE_KEYS = {
+const KEYS = {
   SEARCH_TERM: "movieApp_searchTerm",
-  SORT_BY: "movieApp_sortBy",
-  MEDIA_TYPE: "movieApp_mediaType",
-  GENRE_FILTER: "movieApp_genreFilter",
+  SORT_BY:     "movieApp_sortBy",
+  MEDIA_TYPE:  "movieApp_mediaType",
+  GENRE_FILTER:"movieApp_genreFilter",
   YEAR_FILTER: "movieApp_yearFilter",
-  CURRENT_PAGE: "movieApp_currentPage",
+  CURRENT_PAGE:"movieApp_currentPage",
+  WIPE_ON_LOAD:"movieApp_wipeOnLoad",   // ← فلگ رفرش
+};
+
+const DEFAULT_STATE = {
+  searchTerm:  "",
+  sortBy:      "popularity.desc",
+  mediaType:   "movie",
+  genreFilter: "",
+  yearFilter:  "",
+  currentPage: 1,
 };
 
 /**
- * Save all filter states to sessionStorage
+ * در HomePage یه بار صدا بزن تا listener رجیستر بشه.
+ * وقتی کاربر F5/Ctrl+R میزنه beforeunload فایر میشه
+ * و فلگ رو ست میکنه. Navigation معمولی این فلگ رو ست نمیکنه.
  */
+export const registerRefreshDetector = () => {
+  const handler = () => {
+    sessionStorage.setItem(KEYS.WIPE_ON_LOAD, "true");
+  };
+  window.addEventListener("beforeunload", handler);
+  // cleanup برمیگردونه تا useEffect بتونه remove کنه
+  return () => window.removeEventListener("beforeunload", handler);
+};
+
 export const saveFilterState = ({
   searchTerm,
   sortBy,
@@ -24,68 +40,56 @@ export const saveFilterState = ({
   currentPage,
 }) => {
   try {
-    sessionStorage.setItem(STORAGE_KEYS.SEARCH_TERM, searchTerm);
-    sessionStorage.setItem(STORAGE_KEYS.SORT_BY, sortBy);
-    sessionStorage.setItem(STORAGE_KEYS.MEDIA_TYPE, mediaType);
-    sessionStorage.setItem(STORAGE_KEYS.GENRE_FILTER, genreFilter);
-    sessionStorage.setItem(STORAGE_KEYS.YEAR_FILTER, yearFilter);
-    sessionStorage.setItem(STORAGE_KEYS.CURRENT_PAGE, String(currentPage));
-  } catch (error) {
-    console.error("Error saving filter state to sessionStorage:", error);
+    sessionStorage.setItem(KEYS.SEARCH_TERM,  searchTerm);
+    sessionStorage.setItem(KEYS.SORT_BY,      sortBy);
+    sessionStorage.setItem(KEYS.MEDIA_TYPE,   mediaType);
+    sessionStorage.setItem(KEYS.GENRE_FILTER, genreFilter);
+    sessionStorage.setItem(KEYS.YEAR_FILTER,  yearFilter);
+    sessionStorage.setItem(KEYS.CURRENT_PAGE, String(currentPage));
+  } catch (e) {
+    console.error("saveFilterState:", e);
   }
 };
 
-/**
- * Load all filter states from sessionStorage
- */
 export const loadFilterState = () => {
   try {
+    const shouldWipe = sessionStorage.getItem(KEYS.WIPE_ON_LOAD) === "true";
+
+    // فلگ رو بلافاصله پاک کن — فقط یه بار اثر داره
+    sessionStorage.removeItem(KEYS.WIPE_ON_LOAD);
+
+    if (shouldWipe) {
+      // رفرش بوده → همه فیلترها رو پاک کن و default برگردون
+      Object.values(KEYS).forEach((k) => sessionStorage.removeItem(k));
+      return { ...DEFAULT_STATE };
+    }
+
     return {
-      searchTerm: sessionStorage.getItem(STORAGE_KEYS.SEARCH_TERM) || "",
-      sortBy: sessionStorage.getItem(STORAGE_KEYS.SORT_BY) || "popularity.desc",
-      mediaType: sessionStorage.getItem(STORAGE_KEYS.MEDIA_TYPE) || "movie",
-      genreFilter: sessionStorage.getItem(STORAGE_KEYS.GENRE_FILTER) || "",
-      yearFilter: sessionStorage.getItem(STORAGE_KEYS.YEAR_FILTER) || "",
-      currentPage:
-        parseInt(sessionStorage.getItem(STORAGE_KEYS.CURRENT_PAGE)) || 1,
+      searchTerm:  sessionStorage.getItem(KEYS.SEARCH_TERM)  || "",
+      sortBy:      sessionStorage.getItem(KEYS.SORT_BY)      || "popularity.desc",
+      mediaType:   sessionStorage.getItem(KEYS.MEDIA_TYPE)   || "movie",
+      genreFilter: sessionStorage.getItem(KEYS.GENRE_FILTER) || "",
+      yearFilter:  sessionStorage.getItem(KEYS.YEAR_FILTER)  || "",
+      currentPage: parseInt(sessionStorage.getItem(KEYS.CURRENT_PAGE)) || 1,
     };
-  } catch (error) {
-    console.error("Error loading filter state from sessionStorage:", error);
-    return {
-      searchTerm: "",
-      sortBy: "popularity.desc",
-      mediaType: "movie",
-      genreFilter: "",
-      yearFilter: "",
-      currentPage: 1,
-    };
+  } catch (e) {
+    console.error("loadFilterState:", e);
+    return { ...DEFAULT_STATE };
   }
 };
 
-/**
- * Clear all filter states from sessionStorage
- */
 export const clearFilterState = () => {
   try {
-    Object.values(STORAGE_KEYS).forEach((key) => {
-      sessionStorage.removeItem(key);
-    });
-  } catch (error) {
-    console.error("Error clearing filter state from sessionStorage:", error);
+    Object.values(KEYS).forEach((k) => sessionStorage.removeItem(k));
+  } catch (e) {
+    console.error("clearFilterState:", e);
   }
 };
 
-/**
- * Update a specific filter state in sessionStorage
- */
 export const updateFilterStateItem = (key, value) => {
   try {
-    if (typeof value === "number") {
-      sessionStorage.setItem(key, String(value));
-    } else {
-      sessionStorage.setItem(key, value);
-    }
-  } catch (error) {
-    console.error("Error updating filter state item in sessionStorage:", error);
+    sessionStorage.setItem(key, typeof value === "number" ? String(value) : value);
+  } catch (e) {
+    console.error("updateFilterStateItem:", e);
   }
 };

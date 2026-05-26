@@ -2,7 +2,7 @@
  * HomePage — search, discover filters, trending searches, paginated grid.
  * Filter state persists in sessionStorage (see sessionStorageManager).
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "react-use";
 import Search from "@/components/Search";
 import MovieCard from "@/components/MovieCard";
@@ -17,11 +17,13 @@ import { fetchMoviesList } from "@/services/movieService";
 import {
   loadFilterState,
   saveFilterState,
+  registerRefreshDetector,
 } from "@/utils/sessionStorageManager";
 import { normalizeSortForMediaType, TMDB_MAX_PAGE } from "@/lib/tmdb";
 
 export default function HomePage() {
-  const initialState = loadFilterState();
+  const initialState = useRef(loadFilterState()).current;
+  const isMountedRef = useRef(false); 
 
   const [searchTerm, setSearchTerm] = useState(initialState.searchTerm);
   const [error, setError] = useState("");
@@ -49,13 +51,17 @@ export default function HomePage() {
 
   useDebounce(
     () => {
+      // اولین بار که mount میشه، debounce رو skip کن
+      if (!isMountedRef.current) {
+        isMountedRef.current = true;
+        return;
+      }
       setDebouncedValue(searchTerm);
       setCurrentPage(1);
     },
     800,
     [searchTerm],
   );
-
   const handleSetSortBy = (val) => {
     setSortBy(val);
     setCurrentPage(1);
@@ -166,6 +172,11 @@ export default function HomePage() {
   ]);
 
   const retryFetch = () => setRetryKey((k) => k + 1);
+
+  useEffect(() => {
+    const cleanup = registerRefreshDetector();
+    return cleanup;
+  }, []);
 
   return (
     <main>
