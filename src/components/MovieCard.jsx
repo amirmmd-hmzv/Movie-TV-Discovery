@@ -18,6 +18,7 @@ export default function MovieCard({
     ...movieData
   },
 }) {
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isSaved, toggle } = useWatchlist();

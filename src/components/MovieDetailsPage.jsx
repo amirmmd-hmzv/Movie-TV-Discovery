@@ -232,7 +232,12 @@ function MovieDetailsPage() {
     return (
       <div className="details-error">
         <p>{error}</p>
-        <button onClick={() => navigate("/")} className="back-btn">
+        <button
+          onClick={() =>
+            window.history.length > 1 ? navigate(-1) : navigate("/")
+          }
+          className="back-btn"
+        >
           ← Back to Home
         </button>
       </div>
@@ -304,10 +309,7 @@ function MovieDetailsPage() {
             className="details-score"
             style={{ "--score-color": scoreColor }}
           >
-            <span
-              className="details-score__num"
-              style={{ color: scoreColor }}
-            >
+            <span className="details-score__num" style={{ color: scoreColor }}>
               {movie.vote_average?.toFixed(1)}
             </span>
           </div>
