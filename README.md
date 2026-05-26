@@ -8,11 +8,25 @@ A React portfolio app to **discover movies and TV series**, **search** with debo
 
 ## Screenshots
 
-> Add your own images under `docs/screenshots/` (see [docs/screenshots/README.md](docs/screenshots/README.md)).
+### Home Page — Search & Discover
 
-| Home | Details | Watchlist |
-|------|---------|-----------|
-| ![Home](/screenshots/home.png) | ![Details](docs/screenshots/details.png) | ![Watchlist](docs/screenshots/watchlist.png) |
+![Home Page](docs/screenshots/home.png)
+
+### Home Page — Trending & Filters
+
+![Home Page with Trending](docs/screenshots/home2.PNG)
+
+### Movie Details Page
+
+![Movie Details](docs/screenshots/details.PNG)
+
+### Watchlist Page
+
+![Watchlist](docs/screenshots/watchlist.PNG)
+
+### Alternative Home View
+
+![Home Alternative](docs/screenshots/home3.PNG)
 
 ## Features
 
@@ -26,13 +40,13 @@ A React portfolio app to **discover movies and TV series**, **search** with debo
 
 ## Tech stack
 
-| Layer | Choice |
-|-------|--------|
-| UI | React 19, React Router 7 |
-| Build | Vite 7 |
-| Styling | Tailwind CSS v4 |
-| Data | TMDB API, Appwrite (auth + DB) |
-| HTTP | Axios |
+| Layer   | Choice                         |
+| ------- | ------------------------------ |
+| UI      | React 19, React Router 7       |
+| Build   | Vite 7                         |
+| Styling | Tailwind CSS v4                |
+| Data    | TMDB API, Appwrite (auth + DB) |
+| HTTP    | Axios                          |
 
 ## Project structure
 
@@ -54,20 +68,20 @@ movie-app/
 
 Copy `.env.example` to `.env` (or `.env.local`):
 
-| Variable | Description |
-|----------|-------------|
-| `VITE_TMDB_API_KEY` | TMDB v4 read access token |
-| `VITE_APPWRITE_*` | Appwrite endpoint, project, database, collection IDs |
+| Variable            | Description                                          |
+| ------------------- | ---------------------------------------------------- |
+| `VITE_TMDB_API_KEY` | TMDB v4 read access token                            |
+| `VITE_APPWRITE_*`   | Appwrite endpoint, project, database, collection IDs |
 
 > For a portfolio/demo, the TMDB key is used from the client via Vite env vars. Do not commit `.env` to git.
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server |
-| `npm run build` | Production build → `dist/` |
-| `npm run preview` | Preview production build |
+| Command           | Description                |
+| ----------------- | -------------------------- |
+| `npm run dev`     | Start Vite dev server      |
+| `npm run build`   | Production build → `dist/` |
+| `npm run preview` | Preview production build   |
 
 ### Development
 
