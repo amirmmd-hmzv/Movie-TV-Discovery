@@ -26,11 +26,11 @@ const toInt = (id) => Number(id);
 /**
  * updateSearchCount — Track search terms and update trending list
  * Creates new record or increments count for existing search term
- * 
+ *
  * @param {string} searchTerm - User's search query
  * @param {object} movie - TMDB movie/TV data object
  * @param {string} mediaType - "movie" or "tv"
- * 
+ *
  * Note: Only searchTerm is used as unique key (not mediaType)
  * This allows "spider" searches for both movies and TV to count together
  */
@@ -81,9 +81,9 @@ export const updateSearchCount = async (searchTerm, movie, mediaType) => {
 /**
  * getTrendingMovies — Get most searched titles
  * Deduplicates by title name (case-insensitive) and returns top 10
- * 
+ *
  * @returns {Promise<Array>} Array of trending search documents sorted by count
- * 
+ *
  * Deduplication Logic:
  * If same title searched multiple times with different search terms,
  * only show once and sum all counts
@@ -133,7 +133,7 @@ export const getTrendingMovies = async () => {
 /**
  * addToWatchlist — Add movie/TV series to user's watchlist
  * Prevents duplicates by checking existing entry
- * 
+ *
  * @param {string} userId - Appwrite user ID
  * @param {number|string} movieId - TMDB movie/TV ID
  * @param {string} mediaType - "movie" or "tv"
@@ -193,7 +193,7 @@ export const addToWatchlist = async (userId, movieId, mediaType, movieData) => {
 
 /**
  * removeFromWatchlist — Remove movie/TV series from user's watchlist
- * 
+ *
  * @param {string} userId - Appwrite user ID
  * @param {number|string} movieId - TMDB movie/TV ID
  * @param {string} mediaType - "movie" or "tv"
@@ -232,7 +232,7 @@ export const removeFromWatchlist = async (userId, movieId, mediaType) => {
 /**
  * isInWatchlist — Check if title is in user's watchlist
  * Used by WatchlistContext for O(1) lookup (via Set)
- * 
+ *
  * @param {string} userId - Appwrite user ID
  * @param {number|string} movieId - TMDB movie/TV ID
  * @param {string} mediaType - "movie" or "tv"
@@ -259,7 +259,7 @@ export const isInWatchlist = async (userId, movieId, mediaType) => {
 /**
  * getUserWatchlist — Fetch all titles in user's watchlist
  * Returns sorted by most recently added (descending)
- * 
+ *
  * @param {string} userId - Appwrite user ID
  * @returns {Promise<Array>} Array of watchlist documents (max 100)
  */
@@ -284,7 +284,7 @@ export const getUserWatchlist = async (userId) => {
 /**
  * clearWatchlist — Remove all items from user's watchlist
  * Deletes all documents where userId matches
- * 
+ *
  * @param {string} userId - Appwrite user ID
  * @returns {Promise<object>} {success} on completion
  */

@@ -48,13 +48,13 @@ function AuthLoadingScreen() {
  */
 export default function GuestRoute({ children }) {
   const { user, loading } = useAuth();
-  
+
   // Show loading screen while checking authentication status
   if (loading) return <AuthLoadingScreen />;
-  
+
   // Redirect to home if already authenticated
   if (user) return <Navigate to="/" replace />;
-  
+
   // Render guest content (login/signup)
   return children;
 }

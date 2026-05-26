@@ -23,7 +23,7 @@ import { normalizeSortForMediaType, TMDB_MAX_PAGE } from "@/lib/tmdb";
 
 export default function HomePage() {
   const initialState = useRef(loadFilterState()).current;
-  const isMountedRef = useRef(false); 
+  const isMountedRef = useRef(false);
 
   const [searchTerm, setSearchTerm] = useState(initialState.searchTerm);
   const [error, setError] = useState("");

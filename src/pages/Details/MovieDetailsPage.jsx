@@ -284,14 +284,14 @@ function MovieDetailsPage() {
 
   // Extract trailer from videos array
   const trailer = movie.videos?.results?.find((v) => v.type === "Trailer");
-  
+
   // Extract director (movies) or creator (TV series)
   const director = movie.credits?.crew?.find((c) => c.job === "Director");
   const creator =
     mediaType === "tv" && movie.created_by?.length > 0
       ? movie.created_by[0].name
       : null;
-  
+
   // Get first 8 cast members
   const cast = movie.credits?.cast?.slice(0, 8) || [];
 

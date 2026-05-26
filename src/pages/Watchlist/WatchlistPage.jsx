@@ -12,11 +12,11 @@ import { watchlistKey } from "@/lib/watchlistKeys";
 export default function WatchlistPage() {
   const navigate = useNavigate();
   const { items, loading, remove } = useWatchlist();
-  
+
   // ─────── State ───────
   const [deletingKey, setDeletingKey] = useState(null);
-  const [filter, setFilter] = useState("all");          // all | movie | tv
-  const [sort, setSort] = useState("newest");           // newest | oldest | rating
+  const [filter, setFilter] = useState("all"); // all | movie | tv
+  const [sort, setSort] = useState("newest"); // newest | oldest | rating
 
   /**
    * Navigate back or to home if no history available
@@ -187,7 +187,7 @@ export default function WatchlistPage() {
               const key = watchlistKey(item.movieId, item.mediaType);
               const isDeleting = deletingKey === key;
               const score = Number(item.vote_average) || 0;
-              
+
               // Color code scores: green (7.5+), yellow (5-7.5), red (<5)
               const scoreClass =
                 score >= 7.5
@@ -213,20 +213,20 @@ export default function WatchlistPage() {
                         alt={item.title}
                         loading="lazy"
                       />
-                      
+
                       {/* Overlay gradient */}
                       <div className="movie-card__overlay" aria-hidden="true" />
-                      
+
                       {/* Media type badge: Movie or Series */}
                       <span className="movie-card__type-badge">
                         {item.mediaType === "tv" ? "Series" : "Movie"}
                       </span>
-                      
+
                       {/* Vote score */}
                       <span className={`movie-card__score ${scoreClass}`}>
                         ★ {score > 0 ? score.toFixed(1) : "N/A"}
                       </span>
-                      
+
                       {/* Favorite/Remove button */}
                       <button
                         type="button"
@@ -305,7 +305,7 @@ function WatchlistSkeleton() {
           marginBottom: 8,
         }}
       />
-      
+
       {/* Subtitle skeleton */}
       <div
         style={{
@@ -316,7 +316,7 @@ function WatchlistSkeleton() {
           marginBottom: 32,
         }}
       />
-      
+
       {/* Filter tabs skeleton */}
       <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
         {[60, 72, 64].map((w, i) => (
@@ -326,7 +326,7 @@ function WatchlistSkeleton() {
           />
         ))}
       </div>
-      
+
       {/* Movie grid skeleton — 8 cards */}
       <div
         style={{

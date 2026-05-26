@@ -9,11 +9,11 @@ import { signIn, getCurrentUser } from "@/services/authService";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
   const { setUser } = useAuth();
 
-  const [form, setForm]       = useState({ email: "", password: "" });
-  const [error, setError]     = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Update form field when user types
@@ -54,11 +54,24 @@ export default function LoginPage() {
         {/* Error message display */}
         {error && (
           <div className="auth-error" role="alert">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <circle cx="12" cy="16" r="0.6" fill="currentColor" stroke="none"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <circle
+                cx="12"
+                cy="16"
+                r="0.6"
+                fill="currentColor"
+                stroke="none"
+              />
             </svg>
             {error}
           </div>
@@ -69,7 +82,9 @@ export default function LoginPage() {
           <div className="auth-field">
             <label htmlFor="email">Email</label>
             <input
-              id="email" name="email" type="email"
+              id="email"
+              name="email"
+              type="email"
               placeholder="you@example.com"
               value={form.email}
               onChange={handleChange}
@@ -81,7 +96,9 @@ export default function LoginPage() {
           <div className="auth-field">
             <label htmlFor="password">Password</label>
             <input
-              id="password" name="password" type="password"
+              id="password"
+              name="password"
+              type="password"
               placeholder="••••••••"
               value={form.password}
               onChange={handleChange}
@@ -97,8 +114,7 @@ export default function LoginPage() {
 
         {/* Redirect to signup for new users */}
         <p className="auth-card__footer">
-          Don't have an account?{" "}
-          <Link to="/signup">Create one</Link>
+          Don't have an account? <Link to="/signup">Create one</Link>
         </p>
       </div>
     </div>

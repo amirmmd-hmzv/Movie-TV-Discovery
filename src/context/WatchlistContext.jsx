@@ -1,6 +1,6 @@
 /**
  * WatchlistContext — Single source of truth for user's saved titles.
- * 
+ *
  * Performance Optimization:
  * - Loads user's watchlist once (avoids N+1 Appwrite queries per MovieCard)
  * - Uses Set data structure for O(1) lookup time (isSaved checks)
@@ -34,7 +34,7 @@ const WatchlistContext = createContext(null);
  */
 export function WatchlistProvider({ children }) {
   const { user } = useAuth();
-  
+
   // ─────── State ───────
   // savedKeys: Set for O(1) lookup, prevents "isSaved" N+1 queries
   const [savedKeys, setSavedKeys] = useState(() => new Set());
@@ -94,7 +94,12 @@ export function WatchlistProvider({ children }) {
     async (movieId, mediaType, movieData) => {
       if (!user?.$id) return { success: false, needsAuth: true };
 
-      const result = await addToWatchlist(user.$id, movieId, mediaType, movieData);
+      const result = await addToWatchlist(
+        user.$id,
+        movieId,
+        mediaType,
+        movieData,
+      );
       if (result.success) {
         const key = watchlistKey(movieId, mediaType);
         // Update Set for fast lookup
