@@ -16,6 +16,11 @@ A React portfolio app to **discover movies and TV series**, **search** with debo
 
 ![Home Page with Trending](docs/screenshots/home2.PNG)
 
+### Home Page With Cards
+
+![Home Cards](docs/screenshots/home3.PNG)
+
+
 ### Movie Details Page
 
 ![Movie Details](docs/screenshots/details.PNG)
@@ -24,9 +29,7 @@ A React portfolio app to **discover movies and TV series**, **search** with debo
 
 ![Watchlist](docs/screenshots/watchlist.PNG)
 
-### Alternative Home View
 
-![Home Alternative](docs/screenshots/home3.PNG)
 
 ## Features
 
