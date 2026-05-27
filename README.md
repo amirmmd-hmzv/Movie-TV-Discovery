@@ -6,7 +6,7 @@ A React portfolio app to **discover movies and TV series**, **search** with debo
 ![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?logo=tailwindcss)
 ![Appwrite](https://img.shields.io/badge/Appwrite-FD366E?style=flat&logo=appwrite&logoColor=white)
-![TMDB](https://img.shields.io/badge/TMDB-01b4e4?style=for-the-badge&logo=themoviedatabase&logoColor=white)
+![TMDB API](https://img.shields.io/badge/API-TMDB-01D277?logo=themoviedatabase&logoColor=white)
 ## Screenshots
 
 ### Home Page — Search & Discover
