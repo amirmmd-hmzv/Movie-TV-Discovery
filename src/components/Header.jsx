@@ -207,25 +207,41 @@ export default function Header() {
         )}
 
         {/* ── Hamburger ── */}
-        <button
-          type="button"
-          onClick={() => setMobileOpen((o) => !o)}
-          aria-label="Toggle menu"
-          aria-expanded={mobileOpen}
-          className="flex md:hidden flex-col gap-1.5 p-2 cursor-pointer bg-transparent border-none"
-        >
-          {[
-            mobileOpen ? { transform:"rotate(45deg) translate(5px,5px)" } : undefined,
-            mobileOpen ? { opacity:0 } : undefined,
-            mobileOpen ? { transform:"rotate(-45deg) translate(5px,-5px)" } : undefined,
-          ].map((style, i) => (
-            <span
-              key={i}
-              className="block w-6 rounded-sm transition-all duration-300"
-              style={{ height:2, background:"#ffd93d", ...style }}
-            />
-          ))}
-        </button>
+{/* ── Hamburger / Close ── */}
+<button
+  type="button"
+  onClick={() => setMobileOpen((o) => !o)}
+  aria-label="Toggle menu"
+  aria-expanded={mobileOpen}
+  className="flex md:hidden items-center justify-center w-10 h-10 cursor-pointer bg-transparent border-none"
+>
+  <div className="relative w-6 h-6">
+    {/* Top line */}
+    <span
+      className="absolute top-1 left-0 block w-6 h-0.5 bg-[#ffd93d] rounded-sm transition-all duration-300"
+      style={{
+        transform: mobileOpen ? "rotate(45deg) translate(5px, 5px)" : "rotate(0)",
+      }}
+    />
+    
+    {/* Middle line */}
+    <span
+      className="absolute top-1/2 left-0 block w-6 h-0.5 bg-[#ffd93d] rounded-sm transition-all duration-300"
+      style={{
+        opacity: mobileOpen ? 0 : 1,
+        transform: "translateY(-50%)",
+      }}
+    />
+    
+    {/* Bottom line */}
+    <span
+      className="absolute bottom-1 left-0 block w-6 h-0.5 bg-[#ffd93d] rounded-sm transition-all duration-300"
+      style={{
+        transform: mobileOpen ? "rotate(-45deg) translate(5px, -5px)" : "rotate(0)",
+      }}
+    />
+  </div>
+</button>
 
         {/* ── Mobile nav ── */}
         {mobileOpen && !loading && (

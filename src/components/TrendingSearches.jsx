@@ -2,7 +2,6 @@ import { useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function TrendingSearches({ trendingSearches }) {
-  console.log(trendingSearches)
   const listRef   = useRef(null);
   const drag      = useRef({ active: false, startX: 0, scrollLeft: 0 });
   const navigate  = useNavigate();
@@ -34,7 +33,6 @@ export default function TrendingSearches({ trendingSearches }) {
 
   /* ── Click vs drag guard ── */
   const onItemClick = useCallback((e, movie) => {
-    // اگه drag بیشتر از 5px بود، navigate نکن
     const moved = Math.abs(listRef.current?.scrollLeft - drag.current.scrollLeft) > 5;
     if (moved) { e.preventDefault(); return; }
     if (movie.tmdb_id && movie.mediaType) {
