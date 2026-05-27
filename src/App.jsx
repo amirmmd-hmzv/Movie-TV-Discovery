@@ -1,23 +1,24 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom"; // ✅ removed BrowserRouter
 import Header from "@/components/Header";
 import ProtectedRoute from "@/components/Routes/ProtectedRoute";
 import GuestRoute from "@/components/Routes/GuestRoute";
 import RouteLoading from "@/components/Routes/RouteLoading";
+import { useScrollRestoration } from "./hooks/useScrollRestoration"; // ✅
 
-/** Home stays eager — first paint / SEO-critical route */
 import HomePage from "@/pages/HomePage";
 import NotFoundPage from "@/pages/NotFound/NotFoundPage";
 
-/** Code-split secondary routes to reduce initial bundle size */
 const LoginPage = lazy(() => import("@/pages/Auth/LoginPage"));
 const SignUpPage = lazy(() => import("@/pages/Auth/SignUpPage"));
 const MovieDetailsPage = lazy(() => import("@/pages/Details/MovieDetailsPage"));
 const WatchlistPage = lazy(() => import("@/pages/Watchlist/WatchlistPage"));
 
 function App() {
+  useScrollRestoration(); // ✅ now inside Router — no error
+
   return (
-    <Router>
+    <>
       <Header />
       <Suspense fallback={<RouteLoading />}>
         <Routes>
@@ -48,11 +49,10 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* 1. This MUST be the last route in the list */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
-    </Router>
+    </>
   );
 }
 

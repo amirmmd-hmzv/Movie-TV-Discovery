@@ -9,13 +9,16 @@ import "./index.css";
 import App from "./App.jsx";
 import { AuthProvider } from "@/context/AuthContext";
 import { WatchlistProvider } from "@/context/WatchlistContext";
+import { BrowserRouter as Router } from "react-router-dom"; // ✅ moved here
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <WatchlistProvider>
-        <App />
-      </WatchlistProvider>
-    </AuthProvider>
+    <Router> {/* ✅ Router wraps everything */}
+      <AuthProvider>
+        <WatchlistProvider>
+          <App />
+        </WatchlistProvider>
+      </AuthProvider>
+    </Router>
   </StrictMode>,
 );

@@ -5,7 +5,7 @@ const KEYS = {
   GENRE_FILTER:"movieApp_genreFilter",
   YEAR_FILTER: "movieApp_yearFilter",
   CURRENT_PAGE:"movieApp_currentPage",
-  WIPE_ON_LOAD:"movieApp_wipeOnLoad",   // ← فلگ رفرش
+  WIPE_ON_LOAD:"movieApp_wipeOnLoad",   
 };
 
 const DEFAULT_STATE = {

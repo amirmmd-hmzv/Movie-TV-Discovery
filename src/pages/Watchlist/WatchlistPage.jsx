@@ -12,7 +12,6 @@ import { watchlistKey } from "@/lib/watchlistKeys";
 export default function WatchlistPage() {
   const navigate = useNavigate();
   const { items, loading, remove } = useWatchlist();
-
   // ─────── State ───────
   const [deletingKey, setDeletingKey] = useState(null);
   const [filter, setFilter] = useState("all"); // all | movie | tv

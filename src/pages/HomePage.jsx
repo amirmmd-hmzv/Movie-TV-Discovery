@@ -23,13 +23,12 @@ import { normalizeSortForMediaType, TMDB_MAX_PAGE } from "@/lib/tmdb";
 
 export default function HomePage() {
   const initialState = useRef(loadFilterState()).current;
-  const isMountedRef = useRef(false);
+  const isMountedRef = useRef(false); 
 
   const [searchTerm, setSearchTerm] = useState(initialState.searchTerm);
   const [error, setError] = useState("");
   const [moviesList, setMoviesList] = useState([]);
   const [trendingSearches, setTrendingSearches] = useState([]);
-  const [trendingLoading, setTrendingLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [debouncedValue, setDebouncedValue] = useState(initialState.searchTerm);
   const [currentPage, setCurrentPage] = useState(initialState.currentPage);
@@ -52,11 +51,7 @@ export default function HomePage() {
 
   useDebounce(
     () => {
-      /**
-       * Optimization: Skip debounce on initial mount
-       * This allows immediate search results without waiting 800ms
-       * After first render, normal debouncing applies (800ms delay)
-       */
+      // اولین بار که mount میشه، debounce رو skip کن
       if (!isMountedRef.current) {
         isMountedRef.current = true;
         return;
