@@ -29,6 +29,14 @@ A React portfolio app to **discover movies and TV series**, **search** with debo
 
 ![Watchlist](docs/screenshots/watchlist.PNG)
 
+### Login Page
+
+![Login](docs/screenshots/login.PNG)
+
+### SignUp Page
+
+![SignUp](docs/screenshots/signup.PNG)
+
 ## Features
 
 - Browse **movies** and **TV series** (discover + search)

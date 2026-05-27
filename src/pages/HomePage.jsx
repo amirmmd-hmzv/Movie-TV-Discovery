@@ -29,6 +29,7 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [moviesList, setMoviesList] = useState([]);
   const [trendingSearches, setTrendingSearches] = useState([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [debouncedValue, setDebouncedValue] = useState(initialState.searchTerm);
   const [currentPage, setCurrentPage] = useState(initialState.currentPage);
